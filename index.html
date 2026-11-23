@@ -672,11 +672,6 @@ body{background-image:var(--bgimg,none);background-attachment:fixed}
 .phone .tile.full .tile-h{padding:8px 8px 8px 12px;flex-wrap:wrap}
 .phone .tile-h h2{font-size:13px}
 .phone .ic{min-width:38px;min-height:38px}
-.phone .tabbar{display:flex;gap:4px;flex:none}
-.tab{flex:1;min-width:0;padding:11px 2px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:12.5px;font-weight:500;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tab.on{background:var(--accent);border-color:var(--accent);color:var(--accentink)}
-.moregrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:2px;overflow:auto;height:100%;align-content:start}
-.morebtn{padding:22px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);font-size:15px;font-weight:500;color:var(--fg)}
 .phone .modal-wrap{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);place-items:stretch}
 .phone .modal,.phone .modal.wide,.phone .modal.docview{width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0;border:0;padding:14px}
 .phone input:not([type=checkbox]):not([type=radio]):not([type=color]),.phone select,.phone textarea{font-size:16px;min-height:42px}
@@ -690,14 +685,48 @@ body{background-image:var(--bgimg,none);background-attachment:fixed}
 .phone .app{height:100%;min-height:0}
 .phone .tile{max-height:none;min-height:0}
 .phone .grid{flex:1}
-.phone .tab{font-size:11px;padding:12px 1px}
-.phone .tabbar{gap:3px}
 .phone .blurb.wt span{display:none}
 .phone .rowmore{display:inline-flex}
 .phone .item .mv{display:none}
 .phone .item.mvopen .mv{display:inline-flex}
 .phone .item.mvopen .r{grid-column:1/-1;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
 .phone .item .r{gap:6px}
+
+.phone .tabbar{display:flex;flex:none;overflow-x:auto;overflow-y:hidden;border-top:1px solid var(--line);padding-top:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.phone .tabbar::-webkit-scrollbar{display:none}
+.tab{flex:0 0 20%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0 2px;background:none;border:0;color:var(--fg3);font-size:10.5px;white-space:nowrap}
+.tab svg{display:block}
+.tab.on{color:var(--accent)}
+.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#pullind{position:fixed;left:0;right:0;top:calc(8px + env(safe-area-inset-top,0px));text-align:center;font-size:13px;color:var(--fg3);z-index:20;pointer-events:none}
+#pullind.ready{color:var(--accent);font-weight:600}
+.phone #clock{cursor:pointer;text-decoration:underline dotted var(--fg3);text-underline-offset:4px}
+.metabtn{background:none;border:0;padding:6px 4px;font:inherit;color:var(--accent);text-decoration:underline dotted;text-underline-offset:4px}
+.weekstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.wk{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 4px;border:1px solid var(--line2);border-radius:10px;background:var(--bg);min-width:0}
+.wk small{font-size:11px;color:var(--fg3)}.wk.we small{color:var(--danger)}
+.wk b{font:500 17px var(--mono);color:var(--fg)}
+.wk .wdot{height:6px;display:flex;align-items:center}
+.wk .wdot i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.wk .wdot i.red{background:var(--danger)}.wk .wdot i.gry{background:var(--fg3);opacity:.7}
+.wk.today{border-color:var(--accent)}.wk.today b{color:var(--accent)}
+.wk.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.wk.bd b{box-shadow:0 0 0 1.5px #e86fa8;border-radius:99px;padding:0 6px}
+.phone .modal{animation:sheetup .22s ease-out}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.phone .modal{animation:none}}
+.phone .tabbar{min-height:58px;flex:0 0 auto}
+.phone .tab{flex:0 0 20%;height:auto;min-height:54px;line-height:1.2;background:transparent;border:0;border-radius:0;box-shadow:none;padding:6px 0 4px;justify-content:center}
+.phone .tab svg{width:24px;height:24px;flex:none}
+.phone .tab span{font-size:10.5px;line-height:1.2;height:auto}
+.phone .calbox[data-swipe=week]{flex:none;min-height:0}
+/* телефон: шапка только со счётчиком и шестерёнкой */
+.phone .brand{font-size:0;gap:0}
+.phone #clock{display:none}
+.phone #cnt{font-size:13px;margin:0}
+.phone .calbox[data-swipe=week]{gap:8px}
+.phone .daytile{gap:8px}
+.phone .daybox{padding-top:8px}
 
 </style>
 <div class="app">
@@ -713,7 +742,7 @@ body{background-image:var(--bgimg,none);background-attachment:fixed}
     </div>
   </header>
   <main class="grid" id="grid"></main>
-  <nav class="tabbar" id="tabbar"></nav>
+  <nav class="tabbar" id="tabbar" data-scroll="tabbar"></nav>
 </div>
 <div class="overlay" id="overlay" hidden></div>
 <div class="modal-wrap" id="modal" hidden></div>
@@ -777,7 +806,7 @@ const PALETTE=['#4fc3b0','#e8b04a','#6aa3f0','#a58bf0','#8cc152','#e68ab8','#ef8
 /* ================= state ================= */
 const COLL=['spheres','tasks','habits','programs','sessions','body','ideas','shop','goals','docs','history','insights','cats','tcats','dcats','subs','mand','trips','tgroups','tripitems','notecats','notes','bdays','prefs'];
 const S={};COLL.forEach(c=>S[c]=[]);
-const ui={open:null,more:false,rowOpen:{},modal:null,drafts:{},confirm:null,loaded:{},slow:false,storeErr:'',
+const ui={open:null,more:false,calFull:false,rowOpen:{},modal:null,drafts:{},confirm:null,loaded:{},slow:false,storeErr:'',
   month:null,selDay:null,hMonth:null,histMonth:null,histDay:null,histSphere:'',histQ:'',
   place:'Зал',sub:{dela:null,spend:null,docs:null,training:null},migrated:false,hc:{},tg:{},swapSel:null,selDayLog:null,trTab:'prog',exSel:'',bodySel:'weight',docSphere:'',docQ:'',dragging:false,focusModal:false};
 
@@ -953,14 +982,24 @@ function modalHtml(){
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
 const PHONE_TABS=['day','dela','habits','spend'];
+const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Мысли',bday:'Дни рожд.'};
+const TABIC={
+ day:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ dela:'<path d="M5 7l2 2 3-3M5 15l2 2 3-3M13 8h6M13 16h6"/>',
+ habits:'<circle cx="12" cy="12" r="8"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+ spend:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/>',
+ insights:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+ training:'<path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/>',
+ docs:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>',
+ subs:'<path d="M4 12a8 8 0 0 1 14-5l2 2M20 4v5h-5M20 12a8 8 0 0 1-14 5l-2-2M4 20v-5h5"/>',
+ goals:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/>',
+ trip:'<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5h6v3M4 13h16"/>',
+ notes:'<path d="M5 4h14v12H9l-4 4z"/>',
+ bday:'<rect x="4" y="10" width="16" height="10" rx="1"/><path d="M3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-4 0M12 7c2-4 6-3 4 0"/>'};
+function phoneTabIds(){const rest=layoutSlots().filter(id=>!PHONE_TABS.includes(id));return PHONE_TABS.concat(rest)}
 function phoneTabbar(){
-  const more=ui.more||!PHONE_TABS.includes(ui.open);
-  return PHONE_TABS.map(id=>{const t=tileById(id);return t?`<button class="tab${!ui.more&&ui.open===id?' on':''}" data-act="tab" data-id="${id}">${esc(t.title)}</button>`:''}).join('')
-    +`<button class="tab${more?' on':''}" data-act="tabMore">Ещё</button>`;
-}
-function phoneMore(){
-  const ids=layoutSlots().filter(id=>!PHONE_TABS.includes(id));
-  return `<div class="moregrid">${ids.map(id=>{const t=tileById(id);return t?`<button class="morebtn" data-act="open" data-id="${id}">${esc(t.title)}</button>`:''}).join('')}</div>`;
+  return phoneTabIds().map(id=>{const t=tileById(id);if(!t)return '';
+    return `<button class="tab${ui.open===id?' on':''}" data-act="tab" data-id="${id}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[id]||''}</svg><span>${esc(TABLBL[id]||t.title)}</span></button>`}).join('');
 }
 function render(){
   applySkin();
@@ -977,11 +1016,12 @@ function render(){
   st.className='status'+(ui.storeErr?' bad':'');
   st.textContent=ui.storeErr?'Нет доступа к хранилищу ('+ui.storeErr+')':ui.slow?'Данные ещё загружаются…':(store.mode==='local'?'Хранение: этот браузер':'');
   const ph=PHONE.matches;
+  const ck=$('#clock');if(ph){ck.dataset.act='calFull'}else delete ck.dataset.act;
   document.body.classList.toggle('phone',ph);
   const ov=$('#overlay');
   if(ph){
-    if(!ui.open&&!ui.more)ui.open='day';
-    $('#grid').innerHTML=ui.more?phoneMore():tileShell(tileById(ui.open),'f');
+    if(!ui.open)ui.open='day';
+    $('#grid').innerHTML=tileShell(tileById(ui.open),'f');
     $('#tabbar').innerHTML=phoneTabbar();
     ov.hidden=true;ov.innerHTML='';
   }else{
@@ -1031,7 +1071,7 @@ function closeModal(){
 acts.open=el=>{if(ui.open!==el.dataset.id){ui.sub[el.dataset.id]=null;if(el.dataset.id==='history')ui.histDay=null}ui.hc={};ui.more=false;ui.open=el.dataset.id;scheduleRender()};
 acts.tab=el=>{ui.more=false;ui.hc={};ui.sub[el.dataset.id]=null;ui.open=el.dataset.id;scheduleRender()};
 acts.rowMore=el=>{ui.rowOpen[el.dataset.id]=!ui.rowOpen[el.dataset.id];scheduleRender()};
-acts.tabMore=()=>{ui.more=true;scheduleRender()};
+acts.calFull=()=>{ui.open='day';ui.hc={};ui.calFull=!ui.calFull;scheduleRender()};
 acts.close=()=>{ui.open=null;scheduleRender()};
 acts.mclose=()=>closeModal();
 acts.noop=()=>{};
@@ -1228,15 +1268,30 @@ function miniCell(date,dn,sel,t){
   const bd=ents.some(e=>e.kind==='bday');
   return `<button class="cal-c mini${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}" data-act="pickDay" data-date="${date}" aria-label="${fmtLong(date)}${ents.length?', есть дела':''}"><span class="dn">${dn}</span>${dot}</button>`;
 }
+function weekCell(date,sel,t,i){
+  const ents=entriesOn(date);
+  const main=ents.filter(e=>e.kind==='task'||e.kind==='sub');
+  let dot='';
+  if(main.length){const open=main.some(e=>!e.done);dot=`<i class="${!open?'gry':date<t?'red':'yel'}"></i>`}
+  else if(ents.some(e=>e.kind!=='bday'))dot='<i class="gry"></i>';
+  const bd=ents.some(e=>e.kind==='bday');
+  return `<button class="wk${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}${i>=5?' we':''}" data-act="pickDay" data-date="${date}"><small>${WD[i]}</small><b class="dn">${+date.slice(8)}</b><span class="wdot">${dot}</span></button>`;
+}
 function dayRender(m){
   const t=today();
   const sel=ui.selDay||t;
   const v=ui.month||ymOf(sel);
   const nav=`<div class="navbar"><button class="ic sm" data-act="monthNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="monthNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
+  if(PHONE.matches&&!ui.calFull){
+    const dow=(pdate(sel).getDay()+6)%7,mon=addDays(sel,-dow);
+    const strip=Array.from({length:7},(_,i)=>{const d=addDays(mon,i);return weekCell(d,sel,t,i)}).join('');
+    const nv=`<div class="navbar"><b>${monthTitle(ymOf(sel))}</b><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
+    return `<div class="grow daytile"><div class="calbox" data-swipe="week">${nv}<div class="weekstrip">${strip}</div></div><div class="daybox" data-scroll="daybox-${m}">${dayPanel(sel,t)}</div></div>`;
+  }
   const cal=calGrid(v,(d,dn)=>miniCell(d,dn,sel,t));
   return `<div class="grow daytile"><div class="calbox">${nav}${cal}</div><div class="daybox" data-scroll="daybox-${m}">${dayPanel(sel,t)}</div></div>`;
 }
-TILES.push({id:'day',title:'Календарь',meta:()=>{const s=ui.selDay||today();return s===today()?fmtDow(s):'выбрано: '+fmtDow(s)},render:dayRender});
+TILES.push({id:'day',title:'Календарь',meta:()=>{const s=ui.selDay||today();const tx=s===today()?fmtDow(s):'выбрано: '+fmtDow(s);return PHONE.matches?`<button class="metabtn" data-act="calFull">${tx} ${ui.calFull?'▴':'▾'}</button>`:tx},render:dayRender});
 acts.monthNav=el=>{ui.month=ymAdd(ui.month||ymOf(ui.selDay||today()),+el.dataset.d);scheduleRender()};
 acts.monthToday=()=>{ui.month=ymOf(today());ui.selDay=today();scheduleRender()};
 acts.pickDay=el=>{ui.selDay=el.dataset.date;ui.month=ymOf(el.dataset.date);scheduleRender()};
@@ -1341,6 +1396,65 @@ forms.postDate=(f,fd)=>{
   store.upd('tasks',f.dataset.id,n=>{n.date=fd.date});
   clearDrafts('pp-');closeModal();toast('Перенесено на '+fmtLong(fd.date));
 };
+
+/* жесты на телефоне: свайп недели/месяца и «потянуть вниз = добавить» */
+(function(){
+  let sx=0,sy=0,mode=null,eligible=false,pull=0;
+  const grid=()=>document.getElementById('grid');
+  function scrolledAncestor(el){
+    for(;el&&el!==document.body;el=el.parentElement){if(el.scrollTop>0)return true}
+    return false;
+  }
+  document.addEventListener('touchstart',e=>{
+    if(!PHONE.matches||ui.modal||e.touches.length!==1){eligible=false;return}
+    const t=e.touches[0];sx=t.clientX;sy=t.clientY;mode=null;pull=0;
+    const tg=e.target;
+    eligible=!!tg.closest('#grid')&&!tg.closest('input,select,textarea,.hwrap')&&!scrolledAncestor(tg);
+    ui._swipeBox=tg.closest&&tg.closest('.calbox');
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!PHONE.matches||ui.modal||!eligible)return;
+    const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(!mode){
+      if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.3)mode='h';
+      else if(dy>12&&dy>Math.abs(dx)*1.3&&!ui._swipeBox)mode='v';
+      else if(dy>12&&dy>Math.abs(dx)*1.3&&ui._swipeBox)mode='v';
+    }
+    if(mode==='v'&&dy>0){
+      e.preventDefault();pull=Math.min(dy*.5,110);
+      const g=grid();g.style.transition='none';g.style.transform='translateY('+pull+'px)';
+      let ind=document.getElementById('pullind');
+      if(!ind){ind=document.createElement('div');ind.id='pullind';document.body.appendChild(ind)}
+      ind.textContent=pull>=70?'Отпусти — новая запись':'Потяни вниз, чтобы добавить';ind.style.opacity=Math.min(1,pull/50);ind.classList.toggle('ready',pull>=70);
+    }
+  },{passive:false});
+  document.addEventListener('touchend',e=>{
+    if(!PHONE.matches)return;
+    const g=grid();
+    if(mode==='v'){
+      g.style.transition='transform .2s';g.style.transform='';
+      const ind=document.getElementById('pullind');if(ind)ind.remove();
+      if(pull>=70)pullAdd();
+    }else if(mode==='h'&&ui._swipeBox&&e.changedTouches[0]){
+      const dx=e.changedTouches[0].clientX-sx;
+      if(Math.abs(dx)>45){
+        const sel=ui.selDay||today();
+        if(ui.calFull){ui.month=ymAdd(ui.month||ymOf(sel),dx<0?1:-1)}
+        else{const d=addDays(sel,dx<0?7:-7);ui.selDay=d;ui.month=ymOf(d)}
+        scheduleRender();
+      }
+    }
+    mode=null;pull=0;eligible=false;
+  },{passive:true});
+})();
+function pullAdd(){
+  const id=ui.open;
+  if(id==='day'){openModal({type:'taskNew',date:ui.selDay||today()});return}
+  const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew'};
+  const b=map[id]&&document.querySelector('#grid [data-act='+map[id]+']')||
+    [...document.querySelectorAll('#grid .tile-h button[data-act]')].find(x=>!['blur','close','open','calFull'].includes(x.dataset.act));
+  if(b)b.click();else if(map[id]&&acts[map[id]])acts[map[id]]({dataset:{}});
+}
 
 /* ===== Плитка «Привычки» ===== */
 const habitsSorted=()=>S.habits.slice().sort((a,b)=>((a.kind==='not')-(b.kind==='not'))||((a.ord??1e6)-(b.ord??1e6)));
