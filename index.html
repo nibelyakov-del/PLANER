@@ -789,7 +789,23 @@ input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .crow+.subs,.crow+.subs+.tbtns,.crow+.tbtns{margin-left:50px}
 .crow+.subs .sub span.subt{color:var(--fg3)}
 .tbtns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 10px 0}
-.tbtns .btn{padding:0 2px;font-size:12.5px;min-width:0}
+.tbtns .btn{padding:6px 2px;font-size:12px;min-width:0;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:1}.tbtns .btn span{display:block}
+
+.modal input[type=date],.tfield{height:40px!important;min-height:40px;box-sizing:border-box;width:100%;line-height:38px}
+.modal .fr>*{min-width:0}
+.modal .fr:has(>label.l) .tfield,.modal .fr:has(>div.l) .tfield{display:block}
+.impbox,.modal .fr.sphrow select,.modal .fr.sphrow input{height:40px!important;min-height:40px;box-sizing:border-box}
+.modal .fr.sphrow{align-items:end}
+.modal .impbox{width:40px}
+.hwrap,.hwrap *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.phone .crow+.tbtns,.crow+.subs+.tbtns{margin-left:0;margin-right:0}
+.modal input[type=date]{height:40px!important;max-height:40px;padding-top:0!important;padding-bottom:0!important;line-height:normal}
+.modal .fr{align-items:start!important}
+.modal .fr.sphrow{align-items:end!important}
+.modal .fr.sphrow .impbox{margin:0}
+.phone .modal input:not([type=checkbox]):not([type=radio]):not([type=color]),.phone .modal select{min-height:40px!important;height:40px}
+.phone .modal textarea{min-height:72px}
+.modal .fr.sphrow:has(>label.l){grid-template-columns:minmax(0,1fr) 40px;gap:10px}
 
 </style>
 <div class="app">
@@ -855,7 +871,10 @@ const IC={
   edit:'<path d="M3 13l.7-2.8L10.5 3.4a1.4 1.4 0 012 2L5.8 12.2 3 13z"/>',
   star:'<path d="M8 2.2l1.7 3.7 4 .4-3 2.7.9 3.9L8 10.8 4.4 12.9l.9-3.9-3-2.7 4-.4L8 2.2z"/>',
   l:'<path d="M10 3L5 8l5 5"/>',
-  r:'<path d="M6 3l5 5-5 5"/>'
+  r:'<path d="M6 3l5 5-5 5"/>',
+  arr:'<path d="M3 8h9M8.5 4l4 4-4 4"/>',
+  undo:'<path d="M3 8a5 5 0 105-5H5M5.5 1L3 3.2 5.5 5.5"/>',
+  out:'<path d="M2.5 9.5V12a1 1 0 001 1h9a1 1 0 001-1V9.5M8 2.5v7M5 6.5l3 3 3-3"/>'
 };
 const ic=(n,s=14,w=1.8)=>`<svg viewBox="0 0 16 16" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 
@@ -951,7 +970,7 @@ function fld(fid,name,o={}){
 function timeFld(fid,name,value){
   const id=fid+'-'+name;
   const v=ui.drafts[id]!==undefined?ui.drafts[id]:(value||'');
-  return `<input type="hidden" id="${id}" name="${name}" value="${esc(v)}" data-draft><button type="button" class="tfield${v?'':' empty'}" data-act="tpOpen" data-id="${id}">${v?esc(v):'Не выбрано'}</button>`;
+  return `<input type="hidden" id="${id}" name="${name}" value="${esc(v)}" data-draft><button type="button" class="tfield${v?'':' empty'}" data-act="tpOpen" data-id="${id}">${v?esc(v):''}</button>`;
 }
 function tpickHtml(){
   const tp=ui.tpick;const rows=[];
@@ -1266,7 +1285,7 @@ function calTaskRow(e,o,c){
   const when=o.showDate&&e.date&&e.date<today()?`<span class="when">${fmtShort(e.date)}</span>`:'';
   const buf=ui.buf&&ui.buf.id===e.id;
   const exp=open?`<div class="subs">${(e.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}"><button class="chk sm ${s.done?'on':''}" style="--c:${c}" data-act="toggleSubtask" data-id="${e.id}" data-sid="${s.id}" aria-label="Подзадача">${ic('check',9,2.4)}</button><span class="subt">${esc(s.t)}</span></div>`).join('')}</div>
-    <div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${e.done?'Вернуть':'Сделано'}</button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">Завтра</button><button class="btn sm" data-act="calRemove" data-id="${e.id}">Убрать</button><button class="btn sm" data-act="editTask" data-id="${e.id}">Изменить</button></div>`:'';
+    <div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button></div>`:'';
   return `<div class="item crow${e.done?' done':''}${o.over?' over':''}${e.imp?' imp':''}${open?' open':''}${buf?' buf':''}" style="--c:${c}" data-act="taskTap" data-id="${e.id}" data-press="${e.id}">
     <span class="time">${e.time?esc(e.time):''}</span>
     <span class="tw"><span class="t">${esc(e.title)}</span>${!open&&frag?`<span class="frag">${esc(frag)}</span>`:''}${open&&e.place?`<span class="frag">${esc(e.place)}</span>`:''}</span>
@@ -1338,7 +1357,7 @@ document.addEventListener('change',e=>{const b=e.target.closest&&e.target.closes
       setTimeout(()=>{ui.suppressTap=false},700);
       if(navigator.vibrate)try{navigator.vibrate(30)}catch(_){}
       scheduleRender();
-    },500);
+    },1000);
   });
   document.addEventListener('pointermove',e=>{if(timer&&Math.hypot(e.clientX-sx,e.clientY-sy)>10)stop()});
   ['pointerup','pointercancel','pointerleave'].forEach(n=>document.addEventListener(n,stop));
