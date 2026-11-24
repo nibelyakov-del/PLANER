@@ -934,6 +934,7 @@ const store={mode:'local',db:null,q:{},
     if(i<0)a.push(item);else a[i]=item;
     if(this.db){const body=clone(item);this.enqueue(c+'/'+item.id,()=>this.db.doc(c+'/'+item.id).set(body))}
     else this.saveLocal(c);
+    if(typeof SYNC!=='undefined')SYNC.mark(c,item.id);
     scheduleRender();return item;
   },
   del(c,id){
@@ -941,6 +942,7 @@ const store={mode:'local',db:null,q:{},
     S[c]=S[c].filter(x=>x.id!==id);
     if(this.db)this.enqueue(c+'/'+id,()=>this.db.doc(c+'/'+id).delete());
     else this.saveLocal(c);
+    if(typeof SYNC!=='undefined')SYNC.mark(c,id);
     scheduleRender();
   },
   upd(c,id,fn){
@@ -2531,7 +2533,7 @@ async function uploadFiles(files,m){
       if(STANDALONE){
         f=await shrinkImage(f);
         const id=uid(),type=f.type||'application/octet-stream';
-        await idb.put({id,name:f.name,type,blob:f});blobMap[id]=URL.createObjectURL(f);
+        await idb.put({id,name:f.name,type,blob:f});blobMap[id]=URL.createObjectURL(f);SYNC.mark('_file',id);
         m.draft.files.push({id,name:f.name,type,size:f.size});continue;
       }
       const type=f.type||'';
@@ -2958,6 +2960,7 @@ MODALS.settings=()=>{
   return `<h3>Настройки</h3><div class="setlist">
     <button class="setrow" data-act="setPage" data-p="layout"><span>Расположение плиток</span><small>перестановка плиток</small>${ic('r',14,2)}</button>
     <button class="setrow" data-act="setPage" data-p="skin"><span>Дизайн</span><small>${SKINS.find(k=>k.id===curSkin()).name}</small>${ic('r',14,2)}</button>
+    <button class="setrow" data-act="syncOpen"><span>Синхронизация</span><small>${SYNC.label()}</small>${ic('r',14,2)}</button>
     <button class="setrow" data-act="backupSave"><span>Сохранить копию</span><small>данные и фото в файл</small></button>
     <button class="setrow" data-act="backupLoad"><span>Загрузить копию</span><small>из файла .json</small></button>
     <div class="setrow dis" aria-disabled="true"><span>Язык</span><small>Русский · смена языка появится позже</small></div></div>`;
@@ -3044,6 +3047,175 @@ acts.restoreGo=async()=>{
   closeModal();toast('Копия загружена');
 };
 
+/* ===== Синхронизация между устройствами (Firebase, REST) — только вне Claude ===== */
+const FB={key:'AIzaSyCxt5LlcRueP0jIyBMJTlYw09QOP1YbliI',project:'plane-39479'};
+const FSDOC=`projects/${FB.project}/databases/(default)/documents`;
+const FSURL='https://firestore.googleapis.com/v1/'+FSDOC;
+const SYNC={
+  on:false,tok:'',exp:0,rt:'',email:'',last:0,u:{},q:{},inited:false,busy:false,again:false,
+  status:'',err:'',at:0,pt:null,tooBig:{},
+  save(){try{localStorage.setItem('planner.sync',JSON.stringify({rt:this.rt,email:this.email,last:this.last,u:this.u,q:this.q,inited:this.inited}))}catch(e){}},
+  load(){try{const s=JSON.parse(localStorage.getItem('planner.sync')||'{}');Object.assign(this,{rt:s.rt||'',email:s.email||'',last:s.last||0,u:s.u||{},q:s.q||{},inited:!!s.inited})}catch(e){}},
+  nextU(){const n=Math.max(Date.now(),this.last+1);this.last=n;return n},
+  async login(email,pw){
+    const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw,returnSecureToken:true})});
+    const j=await r.json();
+    if(!r.ok){const m=(j.error&&j.error.message)||'';throw new Error(/INVALID|EMAIL|PASSWORD|CREDENTIAL/.test(m)?'Неверная почта или пароль':'Ошибка входа: '+m)}
+    this.tok=j.idToken;this.exp=Date.now()+(+j.expiresIn)*1000;this.rt=j.refreshToken;this.email=email;this.save();
+  },
+  async token(){
+    if(this.tok&&Date.now()<this.exp-60000)return this.tok;
+    const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(this.rt)});
+    const j=await r.json();
+    if(!r.ok){if(r.status===400||r.status===401){this.rt='';this.on=false;this.save();this.status='out';scheduleRender()}throw new Error('auth')}
+    this.tok=j.id_token;this.exp=Date.now()+(+j.expires_in)*1000;this.rt=j.refresh_token||this.rt;this.save();return this.tok;
+  },
+  async api(url,body){
+    const go=async()=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+await this.token()},body:JSON.stringify(body)});
+    let r=await go();
+    if(r.status===401){this.tok='';r=await go()}
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error((j.error&&j.error.message)||('HTTP '+r.status));
+    return j;
+  },
+  start(){
+    if(!STANDALONE||!this.rt)return;
+    this.on=true;this.status='ok';
+    this.run();
+    clearInterval(this.pt);this.pt=setInterval(()=>{if(!document.hidden)this.run()},10000);
+  },
+  mark(c,id){
+    if(!this.on||!this.rt)return;
+    this.q[c+'_'+id]=1;this.save();
+    clearTimeout(this.dt);this.dt=setTimeout(()=>this.run(),700);
+  },
+  async run(){
+    if(!this.on)return;
+    if(this.busy){this.again=true;return}
+    this.busy=true;
+    try{
+      if(!navigator.onLine)throw new Error('offline');
+      await this.pull();
+      if(!this.inited)await this.firstMerge();
+      await this.push();
+      this.status='ok';this.err='';this.at=Date.now();
+    }catch(e){
+      this.status=navigator.onLine?'err':'offline';this.err=(e&&e.message)||'';
+    }
+    this.busy=false;
+    if(ui.modal&&ui.modal.type==='settings')scheduleRender();
+    if(this.again){this.again=false;setTimeout(()=>this.run(),300)}
+  },
+  async pull(){
+    let changed=false;
+    for(let guard=0;guard<200;guard++){
+      const res=await this.api(FSURL+':runQuery',{structuredQuery:{from:[{collectionId:'items'}],
+        where:{fieldFilter:{field:{fieldPath:'u'},op:'GREATER_THAN',value:{integerValue:String(this.last)}}},
+        orderBy:[{field:{fieldPath:'u'}}],limit:100}});
+      const docs=res.filter(x=>x.document).map(x=>x.document);
+      for(const d of docs){
+        const f=d.fields||{};const key=d.name.split('/').pop();const u=+(f.u&&f.u.integerValue||0);
+        this.last=Math.max(this.last,u);
+        if(u<=(this.u[key]||0))continue;
+        if(this.q[key]){this.u[key]=u;continue}
+        const c=f.c&&f.c.stringValue,id=f.id&&f.id.stringValue,del=!!(f.d&&f.d.booleanValue),j=f.j&&f.j.stringValue;
+        this.u[key]=u;
+        if(await this.apply(c,id,del,j))changed=true;
+      }
+      this.save();
+      if(docs.length<100)break;
+    }
+    if(changed)scheduleRender();
+  },
+  async apply(c,id,del,j){
+    if(c==='_file'){
+      if(del)return false;
+      try{if(blobMap[id])return false;const o=JSON.parse(j);const blob=await (await fetch(o.data)).blob();
+        await idb.put({id,name:o.name,type:o.type,blob});blobMap[id]=URL.createObjectURL(blob);return true}catch(e){return false}
+    }
+    if(!COLL.includes(c))return false;
+    if(del){const n=S[c].length;S[c]=S[c].filter(x=>x.id!==id);store.saveLocal(c);return S[c].length!==n}
+    try{const it=JSON.parse(j);const i=S[c].findIndex(x=>x.id===id);if(i<0)S[c].push(it);else S[c][i]=it;store.saveLocal(c);return true}catch(e){return false}
+  },
+  async firstMerge(){
+    COLL.forEach(c=>S[c].forEach(it=>{const k=c+'_'+it.id;if(!(k in this.u))this.q[k]=1}));
+    try{(await idb.all()||[]).forEach(r=>{const k='_file_'+r.id;if(!(k in this.u))this.q[k]=1})}catch(e){}
+    this.inited=true;this.save();
+  },
+  async fileDoc(id){
+    const r=await idb.get(id);if(!r)return null;
+    let blob=r.blob;const lim=700000;
+    if(blob.size>lim&&/^image\//.test(blob.type)){
+      try{const bm=await createImageBitmap(blob);
+        for(const [dim,q] of [[1800,.78],[1400,.7],[1000,.62],[800,.55]]){
+          const k=Math.min(1,dim/Math.max(bm.width,bm.height));const cv=document.createElement('canvas');cv.width=Math.round(bm.width*k);cv.height=Math.round(bm.height*k);
+          cv.getContext('2d').drawImage(bm,0,0,cv.width,cv.height);
+          const b=await new Promise(res=>cv.toBlob(res,'image/jpeg',q));if(b&&b.size<=lim){blob=b;break}
+        }}catch(e){}
+    }
+    if(blob.size>lim){if(!this.tooBig[id]){this.tooBig[id]=1;toast('Файл «'+r.name+'» слишком большой для синхронизации (больше 700 КБ)',1)}return null}
+    const data=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(blob)});
+    return JSON.stringify({name:r.name,type:blob.type||r.type,data});
+  },
+  async push(){
+    for(let guard=0;guard<100;guard++){
+      const keys=Object.keys(this.q).slice(0,40);if(!keys.length)break;
+      const writes=[],sent=[];
+      for(const key of keys){
+        const p=key.indexOf('_',key[0]==='_'?1:0);const c=key.slice(0,p),id=key.slice(p+1);
+        let j='',del=false;
+        if(c==='_file'){j=await this.fileDoc(id);if(j===null){delete this.q[key];continue}}
+        else{const it=(S[c]||[]).find(x=>x.id===id);if(it)j=JSON.stringify(it);else del=true}
+        const u=this.nextU();sent.push([key,u]);
+        writes.push({update:{name:FSDOC+'/items/'+key,fields:{c:{stringValue:c},id:{stringValue:id},j:{stringValue:del?'':j},u:{integerValue:String(u)},d:{booleanValue:del}}}});
+      }
+      if(writes.length){await this.api(FSURL+':commit',{writes});sent.forEach(([k,u])=>{this.u[k]=u;delete this.q[k]})}
+      this.save();
+    }
+  },
+  logout(){this.on=false;clearInterval(this.pt);this.tok='';this.rt='';this.inited=false;this.last=0;this.u={};this.save();this.status='';scheduleRender()},
+  label(){
+    if(!STANDALONE)return 'доступна только в версии вне Claude';
+    if(!this.rt)return 'не подключена';
+    if(this.status==='err')return 'ошибка: '+esc(this.err);
+    if(this.status==='offline')return 'нет сети, догоним позже';
+    if(Object.keys(this.q).length)return 'отправляю…';
+    return 'включена · '+esc(this.email);
+  }
+};
+SYNC.load();
+if(STANDALONE){
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)SYNC.run()});
+  window.addEventListener('online',()=>SYNC.run());
+}
+
+MODALS.syncLogin=m=>`<h3>Синхронизация</h3>
+  <p style="margin:0;color:var(--fg2)">Войди почтой и паролем из Firebase, чтобы данные одинаково отображались на телефоне и компьютере.</p>
+  <form id="sy" data-submit="syncLogin" style="display:flex;flex-direction:column;gap:12px">
+    <label class="l">Почта${fld('sy','email',{type:'email',value:SYNC.email,req:1,attrs:'autocomplete="username"'})}</label>
+    <label class="l">Пароль${fld('sy','pw',{type:'password',req:1,attrs:'autocomplete="current-password"'})}</label>
+    ${m.err?`<div style="color:var(--danger);font-size:13px">${esc(m.err)}</div>`:''}
+    <div class="fr"><button class="btn primary"${m.busy?' disabled':''}>${m.busy?'Вхожу…':'Войти'}</button><button type="button" class="btn" data-act="mclose">Позже</button></div>
+  </form>`;
+forms.syncLogin=async(f,fd)=>{
+  const m=ui.modal;if(!m||m.busy)return;
+  m.busy=true;m.err='';scheduleRender();
+  try{
+    await SYNC.login(String(fd.email).trim(),String(fd.pw));
+    clearDrafts('sy');SYNC.inited=false;SYNC.last=0;SYNC.u={};SYNC.start();
+    closeModal();toast('Синхронизация включена');
+  }catch(e){const mm=ui.modal;if(mm){mm.busy=false;mm.err=e.message||'Ошибка'}scheduleRender()}
+};
+MODALS.syncInfo=m=>`<h3>Синхронизация</h3>
+  <p style="margin:0;color:var(--fg2)">Статус: ${SYNC.label()}${SYNC.at?'<br>Последняя сверка: '+new Date(SYNC.at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):''}</p>
+  <div class="fr"><button class="btn primary" data-act="syncNow">Синхронизировать сейчас</button><button class="btn" data-act="syncOut">Выйти</button><button class="btn" data-act="mclose">Закрыть</button></div>`;
+acts.syncOpen=()=>{
+  if(!STANDALONE){toast('Синхронизация работает только в версии вне Claude');return}
+  openModal({type:SYNC.rt?'syncInfo':'syncLogin'});
+};
+acts.syncNow=()=>{SYNC.run();toast('Сверяю…')};
+acts.syncOut=()=>{SYNC.logout();closeModal();toast('Вышел из синхронизации')};
+
 /* ===== запуск ===== */
 (function boot(){
   // порядок плиток на сетке 3×3
@@ -3051,6 +3223,7 @@ acts.restoreGo=async()=>{
   render();
   store.init();
   initCaps();
+  if(STANDALONE){if(SYNC.rt)SYNC.start();else setTimeout(()=>{if(!ui.modal)openModal({type:'syncLogin'})},1200)}
   // смена суток при открытой странице
   let day=today();
   setInterval(()=>{if(today()!==day){day=today();scheduleRender()}},30000);
