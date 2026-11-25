@@ -807,6 +807,19 @@ input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .phone .modal textarea{min-height:72px}
 .modal .fr.sphrow:has(>label.l){grid-template-columns:minmax(0,1fr) 40px;gap:10px}
 
+.dfield{position:relative;display:block;height:40px;min-width:0}
+.dtxt{display:flex;align-items:center;height:40px;box-sizing:border-box;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:14px var(--mono);white-space:nowrap}
+.dfield input[type=date]{position:absolute!important;inset:0;width:100%!important;height:100%!important;opacity:0;margin:0;cursor:pointer;min-height:0!important;max-height:none!important}
+.dfield:focus-within .dtxt{border-color:var(--accent)}
+.tpback{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.28)}
+.tpop{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,92vw);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:8px}
+.tpop .tp-h,.tpop .tp-mb{height:38px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.tp-m{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tp-hint{font-size:11.5px;color:var(--fg3);text-align:center}
+.tpop .fr{display:flex;gap:8px;justify-content:center}
+.modal .l .dfield,.modal .dfield{display:block;width:100%;margin:0;align-self:stretch}
+.modal .dtxt{width:100%;margin:0}
+
 </style>
 <div class="app">
   <header class="top">
@@ -966,8 +979,10 @@ function fld(fid,name,o={}){
   const ph=` placeholder="${esc(o.ph||'')}"`;
   const ex=(o.attrs?' '+o.attrs:'')+(o.req?' required':'')+(o.af?' data-af':'');
   if(type==='textarea')return `<textarea id="${id}" name="${name}" data-draft${ph}${ex}${cls}>${esc(v)}</textarea>`;
+  if(type==='date'&&!o.plain)return `<span class="dfield${v?'':' nodate'}"><span class="dtxt">${v?esc(fmtDMY(v)):''}</span><input id="${id}" name="${name}" type="date" value="${esc(v)}" data-draft${ex}${cls}></span>`;
   return `<input id="${id}" name="${name}" type="${type}" value="${esc(v)}" data-draft${ph}${ex}${cls}>`;
 }
+const fmtDMY=d=>/^\d{4}-\d\d-\d\d$/.test(d)?d.slice(8)+'.'+d.slice(5,7)+'.'+d.slice(0,4):'';
 /* поле времени: кнопка, по нажатию выбор часа, затем минут (шаг 10) */
 function timeFld(fid,name,value){
   const id=fid+'-'+name;
@@ -977,11 +992,12 @@ function timeFld(fid,name,value){
 function tpickHtml(){
   const tp=ui.tpick;const rows=[];
   for(let r=0;r<4;r++){
-    rows.push(`<div class="tp-row">${Array.from({length:6},(_,i)=>{const h=r*6+i;return `<button type="button" class="tp-h${tp.h===h?' on':''}" data-act="tpHour" data-h="${h}">${pad(h)}:00</button>`}).join('')}</div>`);
-    if(tp.h!==null&&Math.floor(tp.h/6)===r)rows.push(`<div class="tp-row tp-m">${[0,10,20,30,40,50].map(m=>`<button type="button" class="tp-mb" data-act="tpMin" data-v="${pad(tp.h)}:${pad(m)}">${pad(tp.h)}:${pad(m)}</button>`).join('')}</div>`);
+    rows.push(`<div class="tp-row">${Array.from({length:6},(_,i)=>{const h=r*6+i;return `<button type="button" class="tp-h${tp.h===h?' on':''}" data-act="tpHour" data-h="${h}" data-tph="${h}">${pad(h)}:00</button>`}).join('')}</div>`);
+    if(tp.h!==null&&Math.floor(tp.h/6)===r)rows.push(`<div class="tp-row tp-m">${[10,20,30,40,50].map(m=>`<button type="button" class="tp-mb" data-act="tpMin" data-v="${pad(tp.h)}:${pad(m)}">${pad(tp.h)}:${pad(m)}</button>`).join('')}</div>`);
   }
-  return `<h3>Выбери время</h3><div class="tp">${rows.join('')}</div>
-  <div class="fr"><button type="button" class="btn" data-act="tpClear">Без времени</button><button type="button" class="btn" data-act="tpBack">Назад</button></div>`;
+  return `<div class="tpback" data-act="tpBack"></div><div class="tpop" role="dialog"><div class="tp">${rows.join('')}</div>
+  <div class="tp-hint">Нажми на час — выбрано. Задержи палец — покажу минуты.</div>
+  <div class="fr"><button type="button" class="btn sm" data-act="tpClear">Без времени</button><button type="button" class="btn sm" data-act="tpBack">Закрыть</button></div></div>`;
 }
 function clearDrafts(prefix){Object.keys(ui.drafts).forEach(k=>{if(k.startsWith(prefix))delete ui.drafts[k]})}
 function weekChips(fid,sel,o={}){
@@ -1075,8 +1091,8 @@ function tileShell(t,m){
 function modalHtml(){
   if(!ui.modal)return '';
   const f=MODALS[ui.modal.type];if(!f)return '';
-  const inner=ui.tpick?tpickHtml():f(ui.modal);
-  return `<div class="backdrop" ${ui.modal.type==='docView'?'data-act="mclose"':''}></div><div class="modal ${ui.modal.wide?'wide':''} ${ui.modal.cls||''}" role="dialog" aria-modal="true">${inner}<button class="ic mx" data-act="mclose" aria-label="Закрыть">${ic('x',15)}</button></div>`;
+  const inner=f(ui.modal);
+  return `<div class="backdrop" ${ui.modal.type==='docView'?'data-act="mclose"':''}></div><div class="modal ${ui.modal.wide?'wide':''} ${ui.modal.cls||''}" role="dialog" aria-modal="true">${inner}<button class="ic mx" data-act="mclose" aria-label="Закрыть">${ic('x',15)}</button></div>${ui.tpick?tpickHtml():''}`;
 }
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
@@ -1149,6 +1165,15 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(t.dataset&&t.dataset.draft!==undefined&&t.id)ui.drafts[t.id]=t.type==='checkbox'?t.checked:t.value;
+  if(t.type==='date'&&t.parentElement&&t.parentElement.classList.contains('dfield')){const p=t.parentElement;p.firstChild.textContent=fmtDMY(t.value);p.classList.toggle('nodate',!t.value)}
+});
+document.addEventListener('change',e=>{const t=e.target;if(t.type==='date'&&t.parentElement&&t.parentElement.classList.contains('dfield')){const p=t.parentElement;p.firstChild.textContent=fmtDMY(t.value);p.classList.toggle('nodate',!t.value)}});
+document.addEventListener('click',e=>{const d=e.target.closest&&e.target.closest('.dfield');if(d){const i=d.querySelector('input');try{i.showPicker&&i.showPicker()}catch(_){}}});
+/* нажатие мимо задачи в календаре убирает кнопки */
+document.addEventListener('click',e=>{
+  if(!PHONE.matches||e.target.closest('.crow,.tbtns,.subs'))return;
+  if(!Object.values(ui.rowOpen).some(Boolean))return;
+  ui.rowOpen={};scheduleRender();
 });
 document.addEventListener('submit',e=>{
   const f=e.target.closest('form[data-submit]');if(!f)return;
@@ -1171,7 +1196,20 @@ function closeModal(){
 }
 acts.open=el=>{if(ui.open!==el.dataset.id){ui.sub[el.dataset.id]=null;if(el.dataset.id==='history')ui.histDay=null}ui.hc={};ui.more=false;ui.open=el.dataset.id;scheduleRender()};
 acts.tpOpen=el=>{ui.tpick={id:el.dataset.id,h:null};scheduleRender()};
-acts.tpHour=el=>{ui.tpick.h=+el.dataset.h;scheduleRender()};
+acts.tpHour=el=>{if(ui.tpSup)return;ui.drafts[ui.tpick.id]=pad(+el.dataset.h)+':00';ui.tpick=null;scheduleRender()};
+(function(){
+  let timer=null,sx=0,sy=0;
+  const stop=()=>{if(timer){clearTimeout(timer);timer=null}};
+  document.addEventListener('pointerdown',e=>{
+    ui.tpSup=false;stop();
+    const b=e.target.closest&&e.target.closest('[data-tph]');if(!b||!ui.tpick)return;
+    sx=e.clientX;sy=e.clientY;
+    timer=setTimeout(()=>{timer=null;ui.tpSup=true;ui.tpick.h=+b.dataset.tph;if(navigator.vibrate)try{navigator.vibrate(20)}catch(_){}scheduleRender()},420);
+  });
+  document.addEventListener('pointermove',e=>{if(timer&&Math.hypot(e.clientX-sx,e.clientY-sy)>10)stop()});
+  ['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,stop));
+  document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-tph]'))e.preventDefault()});
+})();
 acts.tpMin=el=>{ui.drafts[ui.tpick.id]=el.dataset.v;ui.tpick=null;scheduleRender()};
 acts.tpClear=()=>{ui.drafts[ui.tpick.id]='';ui.tpick=null;scheduleRender()};
 acts.tpBack=()=>{ui.tpick=null;scheduleRender()};
@@ -1435,9 +1473,11 @@ function dayRender(m){
   const nav=`<div class="navbar"><button class="ic sm" data-act="monthNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="monthNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
   const banner=ui.buf?`<div class="bufbar"><span>Выбрано: «${esc(ui.buf.title)}». Нажми на дату, чтобы перенести.</span><button class="btn xs" data-act="bufCancel">Отмена</button></div>`:'';
   if(PHONE.matches&&!ui.calFull){
-    const dow=(pdate(sel).getDay()+6)%7,mon=addDays(sel,-dow);
+    if(ui.wkFor!==sel){ui.wkFor=sel;ui.wkOff=0}
+    const anc=addDays(sel,7*(ui.wkOff||0));
+    const dow=(pdate(anc).getDay()+6)%7,mon=addDays(anc,-dow);
     const page=off=>`<div class="wkpage">${Array.from({length:7},(_,i)=>weekCell(addDays(mon,off+i),sel,t,i)).join('')}</div>`;
-    const nv=`<div class="navbar"><b>${monthTitle(ymOf(sel))}</b><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
+    const nv=`<div class="navbar"><b>${monthTitle(ymOf(anc))}</b><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
     return `<div class="grow daytile">${banner}<div class="calbox" data-swipe="week">${nv}<div class="weekcar" data-weekcar>${page(-7)}${page(0)}${page(7)}</div></div><div class="daybox" data-scroll="daybox-${m}">${dayPanel(sel,t)}</div></div>`;
   }
   const cal=calGrid(v,(d,dn)=>miniCell(d,dn,sel,t));
@@ -1445,7 +1485,7 @@ function dayRender(m){
 }
 TILES.push({id:'day',title:'Календарь',meta:()=>{const s=ui.selDay||today();const tx=s===today()?fmtDow(s):'выбрано: '+fmtDow(s);return PHONE.matches?`<button class="metabtn" data-act="calFull">${tx} ${ui.calFull?'▴':'▾'}</button>`:tx},render:dayRender});
 acts.monthNav=el=>{ui.month=ymAdd(ui.month||ymOf(ui.selDay||today()),+el.dataset.d);scheduleRender()};
-acts.monthToday=()=>{ui.month=ymOf(today());ui.selDay=today();scheduleRender()};
+acts.monthToday=()=>{ui.month=ymOf(today());ui.selDay=today();ui.wkOff=0;scheduleRender()};
 acts.pickDay=el=>{
   const d=el.dataset.date;
   if(ui.buf){
@@ -1630,8 +1670,7 @@ document.addEventListener('scroll',e=>{
     const w=c.clientWidth;if(!w)return;
     const idx=Math.round(c.scrollLeft/w);
     if(idx===1||Math.abs(c.scrollLeft-idx*w)>3)return;
-    const sel=ui.selDay||today();const d=addDays(sel,idx===0?-7:7);
-    ui.selDay=d;ui.month=ymOf(d);scheduleRender();
+    ui.wkFor=ui.selDay||today();ui.wkOff=(ui.wkOff||0)+(idx===0?-1:1);scheduleRender();
   },90);
 },true);
 
@@ -2017,13 +2056,12 @@ function deloRow(t){
 function deloForm(fid,key){
   return `<form class="qa-row" id="${fid}" data-submit="addDelo" data-key="${esc(key)}">
     ${fld(fid,'title',{ph:key===NONE?'Скинуть дело из головы…':'Новое дело…',req:1,af:0})}
-    <div style="flex:0 0 130px">${fld(fid,'place',{ph:'Место'})}</div>
     <button class="btn primary" aria-label="Добавить" title="Добавить">${ic('plus',14,2.2)}</button></form>`;
 }
 forms.addDelo=(f,fd)=>{
   const title=(fd.title||'').trim();if(!title)return;
   const key=f.dataset.key;
-  store.put('tasks',{id:uid(),title,date:null,time:'',sphere:key===NONE?null:key,imp:false,place:(fd.place||'').trim(),subs:[],done:false});
+  store.put('tasks',{id:uid(),title,date:null,time:'',sphere:key===NONE?null:key,imp:false,place:'',subs:[],done:false});
   clearDrafts(f.id+'-');
 };
 SUBDEF.dela={tile:'dela',coll:'spheres',special:{key:NONE,label:'Без сферы'},noun:'Сфера',addLabel:'Новая сфера',ph:'Например: Студия, Дом, Здоровье',
@@ -3060,7 +3098,8 @@ const SYNC={
   async login(email,pw){
     const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw,returnSecureToken:true})});
     const j=await r.json();
-    if(!r.ok){const m=(j.error&&j.error.message)||'';throw new Error(/INVALID|EMAIL|PASSWORD|CREDENTIAL/.test(m)?'Неверная почта или пароль':'Ошибка входа: '+m)}
+    if(!r.ok){const m=(j.error&&j.error.message)||'';
+      throw new Error(/OPERATION_NOT_ALLOWED/.test(m)?'В Firebase не включён вход по почте и паролю (Authentication → Sign-in method → Email/Password)':/EMAIL_NOT_FOUND/.test(m)?'Такого пользователя нет: добавь его в Authentication → Users':/INVALID_PASSWORD|INVALID_LOGIN_CREDENTIALS/.test(m)?'Неверный пароль (или пользователя с такой почтой нет в Authentication → Users)':/TOO_MANY/.test(m)?'Слишком много попыток, подожди несколько минут':'Ошибка входа: '+m)}
     this.tok=j.idToken;this.exp=Date.now()+(+j.expiresIn)*1000;this.rt=j.refreshToken;this.email=email;this.save();
   },
   async token(){
