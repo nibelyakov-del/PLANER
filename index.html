@@ -907,6 +907,16 @@ body:not(.phone) .crow .tbtns .btn{height:28px;padding:0 9px;font-size:12px;widt
 body:not(.phone) .crow.nt .time{display:none}
 body:not(.phone) .crow .tbtns{flex-wrap:wrap;max-width:100%;justify-content:flex-end}
 
+.phrow{display:flex;gap:6px;align-items:stretch}
+.phrow .slot{flex:1;min-width:0}
+.phrow .btn{flex:none}
+/* прокрутка только окна, не фона */
+body.mo{overflow:hidden;position:relative}
+#modal{overscroll-behavior:contain}
+#modal .backdrop{touch-action:none}
+.modal{overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.phrow .slot,.phlay .slot{flex-direction:row!important;justify-content:flex-start!important;align-items:center;height:auto!important;min-height:44px;padding:8px 12px;text-align:left}
+
 </style>
 <div class="app">
   <header class="top">
@@ -1065,7 +1075,7 @@ function fld(fid,name,o={}){
   const type=o.type||'text';
   const cls=o.cls?` class="${o.cls}"`:'';
   const ph=` placeholder="${esc(o.ph||'')}"`;
-  const ex=(o.attrs?' '+o.attrs:'')+(o.req?' required':'')+(o.af&&!PHONE.matches?' data-af':'');
+  const ex=(o.attrs?' '+o.attrs:'')+(o.req?' required':'')+(o.af?' data-af':'');
   if(type==='textarea')return `<textarea id="${id}" name="${name}" data-draft${ph}${ex}${cls}>${esc(v)}</textarea>`;
   if(type==='date'&&!o.plain)return `<span class="dfield${v?'':' nodate'}"><span class="dtxt">${v?esc(fmtDMY(v)):''}</span><input id="${id}" name="${name}" type="date" value="${esc(v)}" data-draft${ex}${cls}></span>`;
   return `<input id="${id}" name="${name}" type="${type}" value="${esc(v)}" data-draft${ph}${ex}${cls}>`;
@@ -1200,14 +1210,16 @@ const TABIC={
  trip:'<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5h6v3M4 13h16"/>',
  notes:'<path d="M5 4h14v12H9l-4 4z"/>',
  bday:'<rect x="4" y="10" width="16" height="10" rx="1"/><path d="M3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-4 0M12 7c2-4 6-3 4 0"/>'};
-function phoneTabIds(){
+function phoneOrder(){
   const all=['day',...DEFSLOTS].filter(id=>tileById(id));
   const base=PHONE_TABS.concat(layoutSlots().filter(id=>!PHONE_TABS.includes(id)));
   const p=S.prefs.find(x=>x.id==='layoutPhone');
   let s=[...new Set(((p&&p.slots)||[]).filter(id=>all.includes(id)))];
   base.forEach(id=>{if(all.includes(id)&&!s.includes(id))s.push(id)});
-  return s;
+  const hid=((p&&p.hidden)||[]).filter(id=>id!=='day'&&all.includes(id));
+  return {vis:s.filter(id=>!hid.includes(id)),hid:s.filter(id=>hid.includes(id))};
 }
+function phoneTabIds(){return phoneOrder().vis}
 function phoneTabbar(){
   return phoneTabIds().map(id=>{const t=tileById(id);if(!t)return '';
     return `<button class="tab${ui.open===id?' on':''}" data-act="tab" data-id="${id}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[id]||''}</svg><span>${esc(TABLBL[id]||t.title)}</span></button>`}).join('');
@@ -1241,6 +1253,7 @@ function render(){
     ov.innerHTML=ui.open?`<div class="backdrop" data-act="close"></div>${tileShell(tileById(ui.open),'f')}`:'';
   }
   renderHeaderTiles();
+  document.body.classList.toggle('mo',!!ui.modal);
   const mw=$('#modal');mw.hidden=!ui.modal;mw.innerHTML=modalHtml();
 
   $$('[data-scroll]').forEach(el=>{const p=scr[el.dataset.scroll];if(p){el.scrollLeft=p[0];el.scrollTop=p[1]}});
@@ -3309,10 +3322,13 @@ MODALS.settings=()=>{
   const p=ui.setPage;
   const back=`<button class="btn sm" data-act="setPage" data-p="">${ic('l',12,2)} Настройки</button>`;
   if(p==='layout'&&PHONE.matches){
-    const s=phoneTabIds();
+    const {vis,hid}=phoneOrder();
+    const row=(id,i,hidden)=>{const t=tileById(id);return `<div class="phrow"><button class="slot${!hidden&&ui.swapSel===i?' sel':''}" data-act="${hidden?'noop':'phSlotPick'}" data-i="${i}"><small>${hidden?'·':i+1}</small>${esc(t?t.title:id)}</button>${id==='day'?'':`<button class="btn sm" data-act="${hidden?'phShow':'phHide'}" data-id="${id}">${hidden?'Вернуть':'Скрыть'}</button>`}</div>`};
     return `<div class="fr">${back}</div><h3>Нижнее меню</h3>
-    <div class="hint">Нажми на плитку, потом на другую, и они поменяются местами. Порядок такой же, как в нижней полоске, слева направо.</div>
-    <div class="phlay">${s.map((id,i)=>{const t=tileById(id);return `<button class="slot${ui.swapSel===i?' sel':''}" data-act="phSlotPick" data-i="${i}"><small>${i+1}</small>${esc(t?t.title:id)}</button>`}).join('')}</div>`;
+    <div class="hint">Нажми на плитку, потом на другую, и они поменяются местами. Порядок такой же, как в нижней полоске, слева направо. «Скрыть» убирает плитку из меню, данные остаются.</div>
+    <div class="phlay">${vis.map((id,i)=>row(id,i,false)).join('')}</div>
+    <h3 style="margin-top:14px">Скрытые плитки</h3>
+    ${hid.length?`<div class="phlay">${hid.map(id=>row(id,-1,true)).join('')}</div>`:'<div class="hint">Скрытых плиток нет.</div>'}`;
   }
   if(p==='layout'){
     const s=layoutSlots();
@@ -3364,13 +3380,19 @@ document.addEventListener('drop',e=>{
 });
 document.addEventListener('dragend',()=>{dragSlot=null});
 
+const savePh=(slots,hidden)=>store.put('prefs',{id:'layoutPhone',slots,hidden});
 acts.phSlotPick=el=>{
   const i=+el.dataset.i;
   if(ui.swapSel==null){ui.swapSel=i;scheduleRender();return}
   if(ui.swapSel===i){ui.swapSel=null;scheduleRender();return}
-  const s=phoneTabIds();const t=s[ui.swapSel];s[ui.swapSel]=s[i];s[i]=t;
-  ui.swapSel=null;store.put('prefs',{id:'layoutPhone',slots:s});
+  const {vis,hid}=phoneOrder();const t=vis[ui.swapSel];vis[ui.swapSel]=vis[i];vis[i]=t;
+  ui.swapSel=null;savePh([...vis,...hid],hid);
 };
+acts.phHide=el=>{const {vis,hid}=phoneOrder();const id=el.dataset.id;if(id==='day')return;
+  ui.swapSel=null;if(ui.open===id)ui.open='day';savePh(vis.filter(x=>x!==id).concat(hid,[id]),[...hid,id])};
+acts.phShow=el=>{const {vis,hid}=phoneOrder();const id=el.dataset.id;
+  ui.swapSel=null;const nh=hid.filter(x=>x!==id);savePh([...vis,id,...nh],nh)};
+acts.noop=()=>{};
 
 /* ---------- резервная копия (данные + фото) ---------- */
 const b64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});
