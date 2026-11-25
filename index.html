@@ -736,7 +736,7 @@ body{background-image:var(--bgimg,none);background-attachment:fixed}
 .modal .fr.fr3{grid-template-columns:.75fr 1.35fr 1fr}
 .modal .fr.sphrow{grid-template-columns:minmax(0,1fr) 40px}
 .modal form{gap:14px}
-input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%238a8f99' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px!important}
+input[data-combo]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%238a8f99' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px!important}
 .impbox{position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg3);cursor:pointer;flex:none;font:700 20px var(--mono)}
 .impbox input{position:absolute;inset:0;opacity:0;width:100%!important;height:100%!important;margin:0;cursor:pointer}
 .impbox.on{color:var(--danger);border-color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,var(--bg))}
@@ -819,6 +819,33 @@ input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .tpop .fr{display:flex;gap:8px;justify-content:center}
 .modal .l .dfield,.modal .dfield{display:block;width:100%;margin:0;align-self:stretch}
 .modal .dtxt{width:100%;margin:0}
+
+/* список сфер */
+.combo{position:fixed;z-index:90;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 12px 32px rgba(0,0,0,.45);max-height:240px;overflow:auto;display:flex;flex-direction:column}
+.combo .co{display:flex;align-items:center;gap:8px;text-align:left;padding:9px 10px;border:0;border-radius:7px;background:transparent;color:var(--fg);font-size:14px}
+.combo .co:hover,.combo .co:active{background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.combo .co i{width:9px;height:9px;border-radius:50%;flex:none}
+/* счётчик */
+#cnt .sep{display:inline-block;width:1px;height:12px;background:currentColor;opacity:.4;margin:0 9px -2px}
+#cnt b.over{margin-left:0}
+/* настройки: ровное окно */
+.modal.setmod{max-height:86vh}
+.phone .modal-wrap:has(.modal.setmod){place-items:center;padding:14px}
+.phone .modal.setmod,.phone .modal.wide.setmod{width:100%;height:auto;max-height:84%;border-radius:18px;border:1px solid var(--line);padding:16px}
+.modal .mx,.modal .mx:focus,.modal .mx:focus-visible{outline:none;box-shadow:none;border-color:transparent;background:transparent}
+/* внутри категории */
+.subwrap{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;box-sizing:border-box;border:2px solid var(--c,var(--line));border-radius:14px;padding:10px}
+.subhead{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.subhead>b{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subhead .sp{flex:1}
+.subhead .btn,.subhead .ic{flex:none}
+.subbody{display:flex;flex-direction:column;gap:8px;min-height:0}
+.pricebtn{background:transparent;border:0;color:inherit;font:inherit;padding:3px 6px;border-radius:7px;cursor:pointer}
+.pricebtn.none{color:var(--fg3)}
+.pricebtn:hover{background:color-mix(in srgb,var(--fg) 8%,transparent)}
+.priceinp{width:84px;height:30px!important;min-height:30px!important;text-align:right;padding:0 6px}
+#cnt{white-space:nowrap}
+.phone #cnt{font-size:12px;padding:3px 9px}
 
 </style>
 <div class="app">
@@ -1008,7 +1035,7 @@ function weekChips(fid,sel,o={}){
   }).join('')}</div>`;
 }
 const daysFromForm=fd=>WD.map((w,i)=>fd['d'+i]!==undefined?i:-1).filter(i=>i>=0);
-function sphereSel(fid,value){return fld(fid,'sphere',{ph:'Сфера',value:sphereName(value),attrs:'list="spheres-dl" autocomplete="off"'})}
+function sphereSel(fid,value){return fld(fid,'sphere',{ph:'Сфера',value:sphereName(value),attrs:'data-combo="sph" autocomplete="off"'})}
 
 function ask(key,fn){
   if(ui.confirm===key){ui.confirm=null;fn();return}
@@ -1125,7 +1152,7 @@ function render(){
   $('#clock').textContent=fmtDow(t0);
   const left=entriesOn(t0).filter(e=>!e.done&&(e.kind==='task'||e.kind==='sub'||e.kind==='workout')).length;
   const over=overdueList(t0).filter(e=>e.kind==='task'||e.kind==='sub').length;
-  $('#cnt').innerHTML=(left?'На сегодня осталось: '+left:over?'На сегодня всё':'На сегодня всё сделано')+(over?` <b class="over">просрочено: ${over}</b>`:'');
+  $('#cnt').innerHTML=(left?'На сегодня осталось: '+left:over?'На сегодня всё':'На сегодня всё сделано')+(over?`<i class="sep"></i><b class="over">просрочено: ${over}</b>`:'');
   $('#cnt').className=left||over?'':'zero';
   const st=$('#status');
   st.className='status'+(ui.storeErr?' bad':'');
@@ -1146,7 +1173,7 @@ function render(){
   }
   renderHeaderTiles();
   const mw=$('#modal');mw.hidden=!ui.modal;mw.innerHTML=modalHtml();
-  $('#spheres-dl').innerHTML=S.spheres.map(s=>`<option value="${esc(s.name)}">`).join('');
+
   $$('[data-scroll]').forEach(el=>{const p=scr[el.dataset.scroll];if(p){el.scrollLeft=p[0];el.scrollTop=p[1]}});
   if(typeof postRender==='function')postRender();
   if(ui.focusModal){ui.focusModal=false;const af=$('#modal [data-af]');if(af){af.focus();return}}
@@ -1191,12 +1218,13 @@ function closeModal(){
   ui.tpick=null;
   const m=ui.modal;ui.modal=null;
   const P={doc:'dc-',spendNew:'sn-',delaNew:'dn-',subNew:'sbn',taskNew:'tn-',habitNew:'hn-',subscrNew:'sc-',postpone:'pp-',bday:'bd-'};if(m&&P[m.type])clearDrafts(P[m.type]);
+  if(m&&m.type==='task')clearDrafts('tk-'+m.id+'-');
   if(m&&m.cleanup)m.cleanup();
   scheduleRender();
 }
 acts.open=el=>{if(ui.open!==el.dataset.id){ui.sub[el.dataset.id]=null;if(el.dataset.id==='history')ui.histDay=null}ui.hc={};ui.more=false;ui.open=el.dataset.id;scheduleRender()};
 acts.tpOpen=el=>{ui.tpick={id:el.dataset.id,h:null};scheduleRender()};
-acts.tpHour=el=>{if(ui.tpSup)return;ui.drafts[ui.tpick.id]=pad(+el.dataset.h)+':00';ui.tpick=null;scheduleRender()};
+acts.tpHour=el=>{if(ui.tpSup)return;ui.drafts[ui.tpick.id]=pad(+el.dataset.h)+':00';tpSaved(ui.tpick.id);ui.tpick=null;scheduleRender()};
 (function(){
   let timer=null,sx=0,sy=0;
   const stop=()=>{if(timer){clearTimeout(timer);timer=null}};
@@ -1210,8 +1238,9 @@ acts.tpHour=el=>{if(ui.tpSup)return;ui.drafts[ui.tpick.id]=pad(+el.dataset.h)+':
   ['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,stop));
   document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-tph]'))e.preventDefault()});
 })();
-acts.tpMin=el=>{ui.drafts[ui.tpick.id]=el.dataset.v;ui.tpick=null;scheduleRender()};
-acts.tpClear=()=>{ui.drafts[ui.tpick.id]='';ui.tpick=null;scheduleRender()};
+acts.tpMin=el=>{ui.drafts[ui.tpick.id]=el.dataset.v;tpSaved(ui.tpick.id);ui.tpick=null;scheduleRender()};
+function tpSaved(id){const m=/^tk-(.+)-sch-time$/.exec(id);if(m&&typeof saveSched==='function')saveSched(m[1])}
+acts.tpClear=()=>{ui.drafts[ui.tpick.id]='';tpSaved(ui.tpick.id);ui.tpick=null;scheduleRender()};
 acts.tpBack=()=>{ui.tpick=null;scheduleRender()};
 acts.goCal=()=>{ui.selDay=today();ui.month=ymOf(today());ui.hc={};ui.open=PHONE.matches?'day':null;scheduleRender()};
 acts.tab=el=>{ui.more=false;ui.hc={};ui.sub[el.dataset.id]=null;ui.open=el.dataset.id;scheduleRender()};
@@ -1404,6 +1433,39 @@ document.addEventListener('change',e=>{const b=e.target.closest&&e.target.closes
   document.addEventListener('contextmenu',e=>{if(PHONE.matches&&e.target.closest&&e.target.closest('[data-press]'))e.preventDefault()});
 })();
 
+/* список сфер под полем: открывается по нажатию, фильтруется при вводе */
+(function(){
+  let box=null,cur=null;
+  const close=()=>{if(box){box.remove();box=null}cur=null};
+  const open=inp=>{
+    close();cur=inp;
+    const q=norm(inp.value||'');
+    const all=S.spheres.map(s=>s.name);
+    const list=all.filter(n=>!q||norm(n).includes(q)||norm(n)===q);
+    const show=(inp.dataset.showAll==='1'||!q)?all:list;
+    if(!show.length)return;
+    box=document.createElement('div');box.className='combo';
+    box.innerHTML=show.map(n=>`<button type="button" class="co" data-v="${esc(n)}"><i style="background:${sphereColor((S.spheres.find(x=>x.name===n)||{}).id)}"></i>${esc(n)}</button>`).join('');
+    const r=inp.getBoundingClientRect();
+    box.style.cssText=`left:${r.left}px;top:${r.bottom+4}px;width:${r.width}px`;
+    document.body.appendChild(box);
+    const bb=box.getBoundingClientRect();if(bb.bottom>innerHeight-8){box.style.top=Math.max(8,r.top-bb.height-4)+'px'}
+  };
+  document.addEventListener('focusin',e=>{const t=e.target;if(t.dataset&&t.dataset.combo==='sph'){t.dataset.showAll='1';open(t)}else if(!(box&&box.contains(e.target)))close()});
+  document.addEventListener('click',e=>{const t=e.target;if(t.dataset&&t.dataset.combo==='sph'&&!box){t.dataset.showAll='1';open(t)}});
+  document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.combo==='sph'){t.dataset.showAll='0';open(t)}});
+  document.addEventListener('mousedown',e=>{
+    const b=e.target.closest&&e.target.closest('.combo .co');
+    if(b&&cur){e.preventDefault();const i=cur;i.value=b.dataset.v;
+      i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));close();return}
+    if(box&&!box.contains(e.target)&&e.target!==cur)close();
+  });
+  document.addEventListener('touchstart',e=>{const b=e.target.closest&&e.target.closest('.combo .co');
+    if(b&&cur){e.preventDefault();const i=cur;i.value=b.dataset.v;i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));close()}},{passive:false});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&box){close();e.stopPropagation()}},true);
+  window.addEventListener('scroll',()=>{if(box)close()},true);
+})();
+
 /* ===== Плитка «Календарь»: сверху календарь, снизу выбранный день ===== */
 
 function overdueList(t){
@@ -1529,7 +1591,7 @@ MODALS.task=m=>{
   const fid='tk-'+t.id;
   return `<h3>Задача</h3>
   <label class="l">Название<input id="${fid}-title" data-chg="taskField" data-id="${t.id}" data-f="title" value="${esc(t.title)}" data-af></label>
-  <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)<input id="${fid}-sphere" list="spheres-dl" autocomplete="off" data-chg="taskField" data-id="${t.id}" data-f="sphere" value="${esc(sphereName(t.sphere))}"></label>
+  <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="taskField" data-id="${t.id}" data-f="sphere" value="${esc(sphereName(t.sphere))}"></label>
     ${impBox(`id="${fid}-imp" data-chg="taskField" data-id="${t.id}" data-f="imp"`,!!t.imp)}</div>
   <label class="l">Место<input id="${fid}-place" data-chg="taskField" data-id="${t.id}" data-f="place" value="${esc(t.place||'')}" placeholder="Адрес или название"></label>
   <div class="sec"><div class="sec-h">Подзадачи<b>${(t.subs||[]).length}</b></div>
@@ -1539,10 +1601,10 @@ MODALS.task=m=>{
       <button class="ic sm" data-act="subDel" data-id="${t.id}" data-sid="${s.id}" aria-label="Удалить подзадачу">${ic('x',12)}</button></div>`).join('')}
     <form class="qa-row" id="${fid}-sf" data-submit="addSubtask" data-id="${t.id}" style="margin-top:6px">${fld(fid+'-sf','t',{ph:'Новая подзадача…'})}<button class="btn" aria-label="Добавить подзадачу">${ic('plus',13,2.2)}</button></form></div>
   <form class="sec" id="${fid}-sch" data-submit="schedTask" data-id="${t.id}"><div class="sec-h">В календаре${t.date?`<b>${fmtLong(t.date)}${t.time?', '+t.time:''}</b>`:'<b>не стоит</b>'}</div>
-    <div class="fr"><label class="l">Дата${fld(fid+'-sch','date',{type:'date',value:t.date||'',req:1})}</label>
+    <div class="fr"><label class="l">Дата${fld(fid+'-sch','date',{type:'date',value:t.date||'',attrs:'data-chg="taskSched" data-id="'+t.id+'"'})}</label>
       <div class="l">Время${timeFld(fid+'-sch','time',t.time||'')}</div></div>
-    <div class="fr"><button class="btn">${t.date?'Перенести':'Поставить в календарь'}</button>${t.date?`<button type="button" class="btn" data-act="unschedTask" data-id="${t.id}">Убрать из календаря</button>`:''}</div>
-    <span class="hint">Время можно не указывать, тогда дело ляжет в «Без времени».</span></form>
+    ${t.date?`<div class="fr"><button type="button" class="btn" data-act="unschedTask" data-id="${t.id}">Убрать из календаря</button></div>`:''}
+    <span class="hint">Дата и время сохраняются сразу. Время можно не указывать, тогда дело ляжет в «Без времени».</span></form>
   <div class="fr" style="justify-content:space-between"><div class="fr" style="flex:0 0 auto"><button class="btn" data-act="mclose">Готово</button><button class="btn" data-act="taskDone" data-id="${t.id}">${ic('check',13,2.2)} ${t.done?'Вернуть в работу':'Выполнено'}</button></div>${delBtn('task-'+t.id,'taskDel','data-id="'+t.id+'"')}</div>`;
 };
 chg.taskField=el=>{
@@ -1558,6 +1620,14 @@ chg.taskField=el=>{
     else if(f==='place')n.place=v.trim();
   });
 };
+function saveSched(id){
+  const fid='tk-'+id+'-sch';const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  const date=ui.drafts[fid+'-date']!==undefined?ui.drafts[fid+'-date']:(t.date||'');
+  const time=ui.drafts[fid+'-time']!==undefined?ui.drafts[fid+'-time']:(t.time||'');
+  if(!date)return;
+  store.upd('tasks',id,n=>{n.date=date;n.time=time||''});
+}
+chg.taskSched=el=>saveSched(el.dataset.id);
 forms.schedTask=(f,fd)=>{
   if(!fd.date){toast('Нужна дата',1);return}
   store.upd('tasks',f.dataset.id,n=>{n.date=fd.date;n.time=fd.time||''});
@@ -1859,8 +1929,8 @@ function subView(tile,key){
   const d=SUBDEF[tile];
   const s=subList(tile).find(x=>x.key===key);
   if(!s){ui.sub[tile]=null;return subTilesView(tile,'f')}
-  return `<div class="subhead" style="--c:${s.color}"><button class="btn sm" data-act="subBack" data-tile="${tile}">${ic('l',12,2)} Назад</button><i></i><b>${esc(s.name)}</b><span class="sp"></span>${blurBtn('s:'+tile+':'+key,1)}
-    ${s.special?'':`<button class="btn sm" data-act="subEdit" data-tile="${tile}" data-key="${esc(key)}">${ic('edit',12,2)} Название и цвет</button>`}</div><div class="subbody${blurOn('s:'+tile+':'+key)?' blur':''}">${d.content(key)}</div>`;
+  const bk='s:'+tile+':'+key;
+  return `<div class="subwrap" style="--c:${s.color}"><div class="subhead"><b>${esc(s.name)}</b>${s.special?'':`<button class="ic sm" data-act="subEdit" data-tile="${tile}" data-key="${esc(key)}" aria-label="Изменить название и цвет" title="Название и цвет">${ic('edit',13,2)}</button>`}<span class="sp"></span>${blurBtn(bk,1)}<button class="btn sm" data-act="subBack" data-tile="${tile}">${ic('l',12,2)} Назад</button></div><div class="subbody${blurOn(bk)?' blur':''}">${d.content(key)}</div></div>`;
 }
 function subsRender(tile,m){
   if(m==='f'&&ui.sub[tile])return subView(tile,ui.sub[tile]);
@@ -1904,7 +1974,8 @@ forms.addSub=(f,fd)=>{
   const tile=f.dataset.tile,d=SUBDEF[tile];
   const name=(fd.name||'').trim();if(!name)return;
   if(S[d.coll].some(x=>norm(x.name)===norm(name))){toast('Такое название уже есть',1);return}
-  store.put(d.coll,{id:uid(),name,color:ui.drafts['sbn-color']||PALETTE[0],created:Date.now()});
+  const sph=S.spheres.find(x=>norm(x.name)===norm(name));
+  store.put(d.coll,{id:uid(),name,color:(sph&&d.coll!=='spheres'?sph.color:ui.drafts['sbn-color'])||PALETTE[0],created:Date.now()});
   clearDrafts('sbn');closeModal();
 };
 MODALS.subEdit=m=>{
@@ -1940,7 +2011,8 @@ function resolveCat(coll,fd){
   const nn=(fd.newcat||'').trim();
   if(nn){
     const f=S[coll].find(x=>norm(x.name)===norm(nn));if(f)return f.id;
-    const it={id:uid(),name:nn,color:PALETTE.find(c=>!S[coll].some(x=>x.color===c))||PALETTE[S[coll].length%PALETTE.length],created:Date.now()};
+    const sph=S.spheres.find(x=>norm(x.name)===norm(nn));
+    const it={id:uid(),name:nn,color:(sph&&sph.color)||PALETTE.find(c=>!S[coll].some(x=>x.color===c))||PALETTE[S[coll].length%PALETTE.length],created:Date.now()};
     store.put(coll,it);return it.id;
   }
   if(fd.cat&&S[coll].some(x=>x.id===fd.cat))return fd.cat;
@@ -2010,7 +2082,7 @@ MODALS.idea=m=>{
   const fid='id-'+i.id;
   return `<h3>Идея</h3>
   <label class="l">Текст<textarea id="${fid}-text" data-chg="ideaField" data-id="${i.id}" data-f="text" data-af>${esc(i.text)}</textarea></label>
-  <label class="l">Сфера<input id="${fid}-sphere" list="spheres-dl" autocomplete="off" data-chg="ideaField" data-id="${i.id}" data-f="sphere" value="${esc(sphereName(i.sphere))}"></label>
+  <label class="l">Сфера<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="ideaField" data-id="${i.id}" data-f="sphere" value="${esc(sphereName(i.sphere))}"></label>
   <div class="sec"><div class="sec-h">Поставить дату${t?'<b>есть задача</b>':''}</div>
     <div class="fr"><label class="l">Дата<input type="date" id="${fid}-date" data-chg="ideaDate" data-id="${i.id}" data-f="date" value="${esc(t?.date||'')}"></label>
     <label class="l">Время<input type="time" id="${fid}-time" data-chg="ideaDate" data-id="${i.id}" data-f="time" value="${esc(t?.time||'')}"></label></div>
@@ -2176,7 +2248,7 @@ function spendRow(s){
   return `<div class="shop${s.done?' done':''}">
     <button class="chk ${s.done?'on':''}" data-act="shopToggle" data-id="${s.id}" aria-label="Куплено">${ic('check',11,2.4)}</button>
     <span class="nm">${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a>`:esc(s.title)}${task&&task.date?` <span class="pill">${fmtShort(task.date)}</span>`:''} ${sphChip(s.sphere)}</span>
-    <span class="pr">${s.price?rub(s.price):''}</span>
+    <span class="pr">${ui.priceEdit===s.id?`<input class="priceinp" id="pe-${s.id}" inputmode="decimal" data-chg="shopPrice" data-id="${s.id}" value="${esc(s.price??'')}" placeholder="₽">`:`<button class="pricebtn${s.price?'':' none'}" data-act="priceEdit" data-id="${s.id}" aria-label="Цена" title="Изменить цену">${s.price?rub(s.price):'₽'}</button>`}</span>
     <span class="acts"><button class="ic sm" data-act="shopEdit" data-id="${s.id}" aria-label="Изменить" title="Изменить, сфера, дата">${ic('edit',13)}</button>
     <button class="ic sm" data-act="shopDel" data-id="${s.id}" aria-label="Удалить" title="Удалить">${ic('trash',13)}</button></span></div>`;
 }
@@ -2196,7 +2268,7 @@ function spendContent(cat){
   const items=spendItems(cat);
   const open=S.shop.filter(s=>s.cat===cat&&!s.done);
   const sum=open.reduce((a,s)=>a+(num(s.price)||0),0);
-  return `<div class="fr"><button class="btn sm primary" data-act="spendNew" data-cat="${esc(cat)}">${ic('plus',12,2.2)} Трата</button></div>
+  return `<form class="qa-row" id="${fid}" data-submit="addShopQ" data-cat="${esc(cat)}">${fld(fid,'title',{ph:'Новая трата…',req:1})}<button class="btn primary" aria-label="Добавить" title="Добавить">${ic('plus',14,2.2)}</button></form>
     ${items.map(spendRow).join('')||'<div class="empty"><b>Здесь пусто.</b><br>Добавь позицию: название, ссылка, цена. Купил, отметил, и она уйдёт в историю.</div>'}
     <div class="total sticky-b"><span>К оплате: ${open.length} поз.</span><b>${rub(sum)}</b></div>`;
 }
@@ -2251,7 +2323,7 @@ MODALS.shop=m=>{
   return `<h3>Покупка</h3>
   <label class="l">Название<input id="${fid}-title" data-chg="shopField" data-id="${s.id}" data-f="title" value="${esc(s.title)}" data-af></label>
   <div class="fr"><label class="l">Категория<select id="${fid}-cat" data-chg="shopField" data-id="${s.id}" data-f="cat">${S.cats.map(c=>`<option value="${c.id}"${c.id===s.cat?' selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
-  <label class="l">Сфера (необязательно)<input id="${fid}-sphere" list="spheres-dl" autocomplete="off" data-chg="shopField" data-id="${s.id}" data-f="sphere" value="${esc(sphereName(s.sphere))}"></label></div>
+  <label class="l">Сфера (необязательно)<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="shopField" data-id="${s.id}" data-f="sphere" value="${esc(sphereName(s.sphere))}"></label></div>
   <div class="fr"><label class="l">Ссылка<input id="${fid}-url" data-chg="shopField" data-id="${s.id}" data-f="url" value="${esc(s.url||'')}"></label>
   <label class="l">Цена, ₽<input id="${fid}-price" inputmode="decimal" data-chg="shopField" data-id="${s.id}" data-f="price" value="${esc(s.price??'')}"></label></div>
   <form class="sec" id="${fid}-sch" data-submit="schedShop" data-id="${s.id}"><div class="sec-h">Поставить дату${t&&t.date?`<b>${fmtLong(t.date)}${t.time?', '+t.time:''}</b>`:''}</div>
@@ -2280,6 +2352,15 @@ acts.unschedShop=el=>{
   store.upd('tasks',s.taskId,n=>{n.date=null;n.time=''});
   syncShopTask(s.id);
 };
+
+forms.addShopQ=(f,fd)=>{
+  const title=(fd.title||'').trim();if(!title)return;
+  store.put('shop',{id:uid(),title,url:'',price:null,cat:f.dataset.cat,sphere:null,done:false});
+  clearDrafts(f.id+'-');
+};
+acts.priceEdit=el=>{ui.priceEdit=el.dataset.id;scheduleRender();setTimeout(()=>{const i=document.getElementById('pe-'+el.dataset.id);if(i){i.focus();i.select()}},60)};
+chg.shopPrice=el=>{ui.priceEdit=null;store.upd('shop',el.dataset.id,n=>{n.price=num(el.value)})};
+document.addEventListener('focusout',e=>{if(e.target.classList&&e.target.classList.contains('priceinp'))setTimeout(()=>{if(ui.priceEdit){ui.priceEdit=null;scheduleRender()}},150)});
 
 /* ===== Плитка «Тренировки»: программы, тело, прогресс ===== */
 const BODY_FIELDS=[['weight','Вес тела','кг'],['waist','Талия','см'],['chest','Грудь','см'],['shoulders','Плечи','см'],['biceps','Бицепс','см'],['hips','Бёдра','см']];
@@ -2962,7 +3043,7 @@ function renderHeaderTiles(){
   const el=$('#hdrtiles');if(!el)return;
   el.innerHTML=layoutSlots().slice(7).map(id=>{const t=tileById(id);return t?`<button class="btn sm htile" data-act="open" data-id="${id}">${esc(t.title)}</button>`:''}).join('');
 }
-acts.openSettings=()=>{ui.swapSel=null;ui.setPage=null;openModal({type:'settings',wide:true})};
+acts.openSettings=()=>{ui.swapSel=null;ui.setPage=null;openModal({type:'settings',wide:true,cls:'setmod'})};
 function slotCell(i,id){
   const t=tileById(id);
   return `<button class="slot${ui.swapSel===i?' sel':''}" draggable="true" data-act="slotPick" data-i="${i}" data-slot="${i}">${esc(t?t.title:id)}</button>`;
@@ -3090,24 +3171,44 @@ const FB={key:'AIzaSyCxt5LlcRueP0jIyBMJTlYw09QOP1YbliI',project:'plane-39479'};
 const FSDOC=`projects/${FB.project}/databases/(default)/documents`;
 const FSURL='https://firestore.googleapis.com/v1/'+FSDOC;
 const SYNC={
-  on:false,tok:'',exp:0,rt:'',email:'',last:0,u:{},q:{},inited:false,busy:false,again:false,
+  on:false,tok:'',exp:0,rt:'',email:'',uid:'',migrated:false,lbl:'',last:0,u:{},q:{},inited:false,busy:false,again:false,
   status:'',err:'',at:0,pt:null,tooBig:{},
-  save(){try{localStorage.setItem('planner.sync',JSON.stringify({rt:this.rt,email:this.email,last:this.last,u:this.u,q:this.q,inited:this.inited}))}catch(e){}},
-  load(){try{const s=JSON.parse(localStorage.getItem('planner.sync')||'{}');Object.assign(this,{rt:s.rt||'',email:s.email||'',last:s.last||0,u:s.u||{},q:s.q||{},inited:!!s.inited})}catch(e){}},
+  save(){try{localStorage.setItem('planner.sync',JSON.stringify({rt:this.rt,email:this.email,uid:this.uid,migrated:this.migrated,last:this.last,u:this.u,q:this.q,inited:this.inited}))}catch(e){}},
+  load(){try{const s=JSON.parse(localStorage.getItem('planner.sync')||'{}');Object.assign(this,{rt:s.rt||'',email:s.email||'',uid:s.uid||'',migrated:!!s.migrated,last:s.last||0,u:s.u||{},q:s.q||{},inited:!!s.inited});if(this.rt&&!this.uid){this.last=0;this.u={};this.inited=false;this.migrated=false}}catch(e){}},
   nextU(){const n=Math.max(Date.now(),this.last+1);this.last=n;return n},
-  async login(email,pw){
-    const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw,returnSecureToken:true})});
-    const j=await r.json();
-    if(!r.ok){const m=(j.error&&j.error.message)||'';
-      throw new Error(/OPERATION_NOT_ALLOWED/.test(m)?'В Firebase не включён вход по почте и паролю (Authentication → Sign-in method → Email/Password)':/EMAIL_NOT_FOUND/.test(m)?'Такого пользователя нет: добавь его в Authentication → Users':/INVALID_PASSWORD|INVALID_LOGIN_CREDENTIALS/.test(m)?'Неверный пароль (или пользователя с такой почтой нет в Authentication → Users)':/TOO_MANY/.test(m)?'Слишком много попыток, подожди несколько минут':'Ошибка входа: '+m)}
-    this.tok=j.idToken;this.exp=Date.now()+(+j.expiresIn)*1000;this.rt=j.refreshToken;this.email=email;this.save();
+  authErr(m,up){
+    if(/OPERATION_NOT_ALLOWED/.test(m))return 'В Firebase не включён вход по почте и паролю';
+    if(/EMAIL_EXISTS/.test(m))return 'Такая почта уже зарегистрирована, нажми «Войти»';
+    if(/WEAK_PASSWORD/.test(m))return 'Пароль слишком простой (минимум 6 символов)';
+    if(/INVALID_EMAIL/.test(m))return 'Проверь написание почты';
+    if(/EMAIL_NOT_FOUND/.test(m))return 'Такой почты нет, нажми «Регистрация»';
+    if(/INVALID_PASSWORD|INVALID_LOGIN_CREDENTIALS/.test(m))return 'Неверная почта или пароль';
+    if(/TOO_MANY/.test(m))return 'Слишком много попыток, подожди несколько минут';
+    return 'Ошибка: '+m;
   },
+  async auth(kind,email,pw){
+    const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:'+kind+'?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw,returnSecureToken:true})});
+    const j=await r.json();
+    if(!r.ok)throw new Error(this.authErr((j.error&&j.error.message)||''));
+    const last=localStorage.getItem('planner.lastuid');
+    if(last&&last!==j.localId)this.wipeLocal();
+    try{localStorage.setItem('planner.lastuid',j.localId)}catch(e){}
+    this.tok=j.idToken;this.exp=Date.now()+(+j.expiresIn)*1000;this.rt=j.refreshToken;this.email=email;this.uid=j.localId;
+    this.inited=false;this.migrated=false;this.last=0;this.u={};this.q={};this.save();
+  },
+  login(email,pw){return this.auth('signInWithPassword',email,pw)},
+  signup(email,pw){return this.auth('signUp',email,pw)},
+  async reset(email){
+    const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestType:'PASSWORD_RESET',email})});
+    const j=await r.json();if(!r.ok)throw new Error(this.authErr((j.error&&j.error.message)||''));
+  },
+  wipeLocal(){COLL.forEach(c=>{S[c]=[];try{localStorage.removeItem('planner.'+c)}catch(e){}});scheduleRender()},
   async token(){
     if(this.tok&&Date.now()<this.exp-60000)return this.tok;
     const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+FB.key,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(this.rt)});
     const j=await r.json();
     if(!r.ok){if(r.status===400||r.status===401){this.rt='';this.on=false;this.save();this.status='out';scheduleRender()}throw new Error('auth')}
-    this.tok=j.id_token;this.exp=Date.now()+(+j.expires_in)*1000;this.rt=j.refresh_token||this.rt;this.save();return this.tok;
+    this.tok=j.id_token;this.exp=Date.now()+(+j.expires_in)*1000;this.rt=j.refresh_token||this.rt;this.uid=j.user_id||this.uid;try{if(this.uid&&!localStorage.getItem('planner.lastuid'))localStorage.setItem('planner.lastuid',this.uid)}catch(e){}this.save();return this.tok;
   },
   async api(url,body){
     const go=async()=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+await this.token()},body:JSON.stringify(body)});
@@ -3123,6 +3224,7 @@ const SYNC={
     this.run();
     clearInterval(this.pt);this.pt=setInterval(()=>{if(!document.hidden)this.run()},10000);
   },
+  base(){return FSURL+'/users/'+this.uid},
   mark(c,id){
     if(!this.on||!this.rt)return;
     this.q[c+'_'+id]=1;this.save();
@@ -3134,7 +3236,10 @@ const SYNC={
     this.busy=true;
     try{
       if(!navigator.onLine)throw new Error('offline');
+      await this.token();
+      const first=this.last===0;
       await this.pull();
+      if(!this.migrated){if(first&&this.last===0)await this.migrateOld();this.migrated=true;this.save()}
       if(!this.inited)await this.firstMerge();
       await this.push();
       this.status='ok';this.err='';this.at=Date.now();
@@ -3142,13 +3247,13 @@ const SYNC={
       this.status=navigator.onLine?'err':'offline';this.err=(e&&e.message)||'';
     }
     this.busy=false;
-    if(ui.modal&&ui.modal.type==='settings')scheduleRender();
+    const lb=this.label();if(lb!==this.lbl){this.lbl=lb;if(ui.modal&&(ui.modal.type==='settings'||ui.modal.type==='syncInfo'))scheduleRender()}
     if(this.again){this.again=false;setTimeout(()=>this.run(),300)}
   },
   async pull(){
     let changed=false;
     for(let guard=0;guard<200;guard++){
-      const res=await this.api(FSURL+':runQuery',{structuredQuery:{from:[{collectionId:'items'}],
+      const res=await this.api(this.base()+':runQuery',{structuredQuery:{from:[{collectionId:'items'}],
         where:{fieldFilter:{field:{fieldPath:'u'},op:'GREATER_THAN',value:{integerValue:String(this.last)}}},
         orderBy:[{field:{fieldPath:'u'}}],limit:100}});
       const docs=res.filter(x=>x.document).map(x=>x.document);
@@ -3165,6 +3270,23 @@ const SYNC={
       if(docs.length<100)break;
     }
     if(changed)scheduleRender();
+  },
+  async migrateOld(){
+    /* перенос данных из старого общего раздела (доступен только владельцу) */
+    try{
+      for(let g=0;g<50;g++){
+        const res=await this.api(FSURL+':runQuery',{structuredQuery:{from:[{collectionId:'items'}],limit:100,offset:g*100}});
+        const docs=res.filter(x=>x.document).map(x=>x.document);
+        for(const d of docs){
+          const f=d.fields||{};const key=d.name.split('/').pop();
+          const c=f.c&&f.c.stringValue,id=f.id&&f.id.stringValue,del=!!(f.d&&f.d.booleanValue),j=f.j&&f.j.stringValue;
+          if(del||this.q[key])continue;
+          if(await this.apply(c,id,del,j))scheduleRender();
+          this.q[key]=1;
+        }
+        if(docs.length<100)break;
+      }
+    }catch(e){}
   },
   async apply(c,id,del,j){
     if(c==='_file'){
@@ -3206,13 +3328,13 @@ const SYNC={
         if(c==='_file'){j=await this.fileDoc(id);if(j===null){delete this.q[key];continue}}
         else{const it=(S[c]||[]).find(x=>x.id===id);if(it)j=JSON.stringify(it);else del=true}
         const u=this.nextU();sent.push([key,u]);
-        writes.push({update:{name:FSDOC+'/items/'+key,fields:{c:{stringValue:c},id:{stringValue:id},j:{stringValue:del?'':j},u:{integerValue:String(u)},d:{booleanValue:del}}}});
+        writes.push({update:{name:FSDOC+'/users/'+this.uid+'/items/'+key,fields:{c:{stringValue:c},id:{stringValue:id},j:{stringValue:del?'':j},u:{integerValue:String(u)},d:{booleanValue:del}}}});
       }
       if(writes.length){await this.api(FSURL+':commit',{writes});sent.forEach(([k,u])=>{this.u[k]=u;delete this.q[k]})}
       this.save();
     }
   },
-  logout(){this.on=false;clearInterval(this.pt);this.tok='';this.rt='';this.inited=false;this.last=0;this.u={};this.save();this.status='';scheduleRender()},
+  logout(){this.on=false;clearInterval(this.pt);this.tok='';this.rt='';this.uid='';this.inited=false;this.migrated=false;this.last=0;this.u={};this.q={};this.save();this.status='';scheduleRender()},
   label(){
     if(!STANDALONE)return 'доступна только в версии вне Claude';
     if(!this.rt)return 'не подключена';
@@ -3228,21 +3350,32 @@ if(STANDALONE){
   window.addEventListener('online',()=>SYNC.run());
 }
 
-MODALS.syncLogin=m=>`<h3>Синхронизация</h3>
-  <p style="margin:0;color:var(--fg2)">Войди почтой и паролем из Firebase, чтобы данные одинаково отображались на телефоне и компьютере.</p>
+MODALS.syncLogin=m=>{
+  const mode=m.mode||'in';
+  const tab=(k,t)=>`<button type="button" class="btn sm${mode===k?' primary':''}" data-act="syncMode" data-m="${k}">${t}</button>`;
+  return `<h3>Синхронизация</h3>
+  <div class="fr" style="gap:6px">${tab('in','Войти')}${tab('up','Регистрация')}</div>
+  <p style="margin:0;color:var(--fg2);font-size:13px">${mode==='reset'?'Введи почту, пришлём письмо со ссылкой для нового пароля.':'Данные каждого пользователя хранятся отдельно и одинаково видны на телефоне и компьютере.'}</p>
   <form id="sy" data-submit="syncLogin" style="display:flex;flex-direction:column;gap:12px">
     <label class="l">Почта${fld('sy','email',{type:'email',value:SYNC.email,req:1,attrs:'autocomplete="username"'})}</label>
-    <label class="l">Пароль${fld('sy','pw',{type:'password',req:1,attrs:'autocomplete="current-password"'})}</label>
-    ${m.err?`<div style="color:var(--danger);font-size:13px">${esc(m.err)}</div>`:''}
-    <div class="fr"><button class="btn primary"${m.busy?' disabled':''}>${m.busy?'Вхожу…':'Войти'}</button><button type="button" class="btn" data-act="mclose">Позже</button></div>
+    ${mode==='reset'?'':`<label class="l">Пароль${fld('sy','pw',{type:'password',req:1,attrs:'autocomplete="'+(mode==='up'?'new-password':'current-password')+'"'})}</label>`}
+    ${mode==='up'?`<label class="l">Повтори пароль${fld('sy','pw2',{type:'password',req:1,attrs:'autocomplete="new-password"'})}</label>`:''}
+    ${m.err?`<div style="color:var(--danger);font-size:13px">${esc(m.err)}</div>`:''}${m.ok?`<div style="color:var(--accent);font-size:13px">${esc(m.ok)}</div>`:''}
+    <div class="fr"><button class="btn primary"${m.busy?' disabled':''}>${m.busy?'Подожди…':mode==='up'?'Зарегистрироваться':mode==='reset'?'Отправить письмо':'Войти'}</button><button type="button" class="btn" data-act="mclose">Позже</button></div>
+    ${mode==='in'?`<button type="button" class="btn sm" data-act="syncMode" data-m="reset" style="align-self:flex-start">Забыли пароль?</button>`:''}
   </form>`;
+};
+acts.syncMode=el=>{const m=ui.modal;if(!m)return;m.mode=el.dataset.m;m.err='';m.ok='';scheduleRender()};
 forms.syncLogin=async(f,fd)=>{
   const m=ui.modal;if(!m||m.busy)return;
-  m.busy=true;m.err='';scheduleRender();
+  const mode=m.mode||'in',email=String(fd.email).trim();
+  if(mode==='up'&&String(fd.pw)!==String(fd.pw2)){m.err='Пароли не совпадают';scheduleRender();return}
+  m.busy=true;m.err='';m.ok='';scheduleRender();
   try{
-    await SYNC.login(String(fd.email).trim(),String(fd.pw));
-    clearDrafts('sy');SYNC.inited=false;SYNC.last=0;SYNC.u={};SYNC.start();
-    closeModal();toast('Синхронизация включена');
+    if(mode==='reset'){await SYNC.reset(email);const mm=ui.modal;if(mm){mm.busy=false;mm.ok='Письмо отправлено на '+email+'. Проверь почту и папку «Спам».'}scheduleRender();return}
+    if(mode==='up')await SYNC.signup(email,String(fd.pw));else await SYNC.login(email,String(fd.pw));
+    clearDrafts('sy');SYNC.start();
+    closeModal();toast(mode==='up'?'Аккаунт создан, синхронизация включена':'Синхронизация включена');
   }catch(e){const mm=ui.modal;if(mm){mm.busy=false;mm.err=e.message||'Ошибка'}scheduleRender()}
 };
 MODALS.syncInfo=m=>`<h3>Синхронизация</h3>
