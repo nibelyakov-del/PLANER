@@ -846,6 +846,24 @@ input[data-combo]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
 .priceinp{width:84px;height:30px!important;min-height:30px!important;text-align:right;padding:0 6px}
 #cnt{white-space:nowrap}
 .phone #cnt{font-size:12px;padding:3px 9px}
+/* график */
+.dn.sch{background:var(--sbg);color:var(--sfg)!important;border-radius:50%;display:inline-flex!important;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 3px!important;box-sizing:border-box}
+.wk b.dn.sch{min-width:30px;height:30px}
+.schrows{display:flex;flex-direction:column;gap:4px}
+.schrow{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:color-mix(in srgb,var(--c) 16%,transparent);font-size:13px}
+.schrow i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.schrow span{margin-left:auto;font-family:var(--mono);color:var(--fg2)}
+.schcard{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;background:var(--panel);margin-bottom:8px;cursor:pointer}
+.schcard>i{display:none}
+.schcard .scn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.schcard .scn b{font-size:15px}
+.schcard small{color:var(--fg3);font-size:12px}
+.schcard .scnow{color:var(--c)}
+.schban{border:1px solid var(--c);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--c) 12%,transparent);font-size:14px}
+.sct{display:block;font:10px var(--mono);color:var(--fg3);line-height:1;margin-top:1px;min-height:10px}
+.sct.cu{color:var(--accent)}
+.cal-c.mini:has(.sct){flex-direction:column;gap:1px}
+.chkrow{display:flex;align-items:center;gap:8px;font-size:14px}
 
 </style>
 <div class="app">
@@ -926,7 +944,7 @@ function blurBtn(k,txt){
 const PALETTE=['#4fc3b0','#e8b04a','#6aa3f0','#a58bf0','#8cc152','#e68ab8','#ef8a4d','#5cc8e8','#c3d84e','#c9a0dc','#7fd1a0','#d9916b'];
 
 /* ================= state ================= */
-const COLL=['spheres','tasks','habits','programs','sessions','body','ideas','shop','goals','docs','history','insights','cats','tcats','dcats','subs','mand','trips','tgroups','tripitems','notecats','notes','bdays','prefs'];
+const COLL=['spheres','tasks','habits','programs','sessions','body','ideas','shop','goals','docs','history','insights','cats','tcats','dcats','subs','mand','trips','tgroups','tripitems','notecats','notes','bdays','sched','prefs'];
 const S={};COLL.forEach(c=>S[c]=[]);
 const ui={buf:null,suppressTap:false,mandBlk:{},tpick:null,open:null,more:false,calFull:false,rowOpen:{},modal:null,drafts:{},confirm:null,loaded:{},slow:false,storeErr:'',
   month:null,selDay:null,hMonth:null,histMonth:null,histDay:null,histSphere:'',histQ:'',
@@ -1123,9 +1141,10 @@ function modalHtml(){
 }
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
-const PHONE_TABS=['day','dela','habits','spend'];
-const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Мысли',bday:'Дни рожд.'};
+const PHONE_TABS=['day','sched','dela','habits','spend'];
+const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Мысли',bday:'Дни рожд.',sched:'График'};
 const TABIC={
+ sched:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 14h3M13 14h3M8 17h3"/>',
  day:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
  dela:'<path d="M5 7l2 2 3-3M5 15l2 2 3-3M13 8h6M13 16h6"/>',
  habits:'<circle cx="12" cy="12" r="8"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
@@ -1217,7 +1236,7 @@ function openModal(m){ui.modal=m;ui.focusModal=true;scheduleRender()}
 function closeModal(){
   ui.tpick=null;
   const m=ui.modal;ui.modal=null;
-  const P={doc:'dc-',spendNew:'sn-',delaNew:'dn-',subNew:'sbn',taskNew:'tn-',habitNew:'hn-',subscrNew:'sc-',postpone:'pp-',bday:'bd-'};if(m&&P[m.type])clearDrafts(P[m.type]);
+  const P={sched:'sg',schedDay:'sd-',doc:'dc-',spendNew:'sn-',delaNew:'dn-',subNew:'sbn',taskNew:'tn-',habitNew:'hn-',subscrNew:'sc-',postpone:'pp-',bday:'bd-'};if(m&&P[m.type])clearDrafts(P[m.type]);
   if(m&&m.type==='task')clearDrafts('tk-'+m.id+'-');
   if(m&&m.cleanup)m.cleanup();
   scheduleRender();
@@ -1490,6 +1509,7 @@ function dayPanel(sel,t){
   const isToday=sel===t,past=sel<t;
   let h=`<div class="dayhead"><div class="dayh">${isToday?'Сегодня, ':''}${fmtLong(sel)}<small>${WDS[pdate(sel).getDay()]}</small></div>
     <button class="btn sm primary" data-act="taskNew" data-date="${sel}" aria-label="Новая задача" title="Новая задача">${ic('plus',13,2.4)} Задача</button></div>`;
+  h+=schedRows(sel);
   if(sel<=t)h+=habitPlate(sel);
   let ents=entriesOn(sel);
   const early=isToday?S.tasks.filter(x=>x.done&&x.doneDate===t&&x.date&&x.date<t).map(taskEntry):[];
@@ -1517,7 +1537,8 @@ function miniCell(date,dn,sel,t){
     dot=`<i class="${!open?'gry':date<t?'red':'yel'}"></i>`;
   }else if(ents.some(e=>e.kind!=='bday'))dot='<i class="gry"></i>';
   const bd=ents.some(e=>e.kind==='bday');
-  return `<button class="cal-c mini${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}" data-act="pickDay" data-date="${date}" aria-label="${fmtLong(date)}${ents.length?', есть дела':''}"><span class="dn">${dn}</span>${dot}</button>`;
+  const sc=schedStyle(date);
+  return `<button class="cal-c mini${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}" data-act="pickDay" data-date="${date}" aria-label="${fmtLong(date)}${ents.length?', есть дела':''}"><span class="dn${sc.c}"${sc.s}>${dn}</span>${dot}</button>`;
 }
 function weekCell(date,sel,t,i){
   const ents=entriesOn(date);
@@ -1526,7 +1547,7 @@ function weekCell(date,sel,t,i){
   if(main.length){const open=main.some(e=>!e.done);dot=`<i class="${!open?'gry':date<t?'red':'yel'}"></i>`}
   else if(ents.some(e=>e.kind!=='bday'))dot='<i class="gry"></i>';
   const bd=ents.some(e=>e.kind==='bday');
-  return `<button class="wk${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}${i>=5?' we':''}" data-act="pickDay" data-date="${date}"><small>${WD[i]}</small><b class="dn">${+date.slice(8)}</b><span class="wdot">${dot}</span></button>`;
+  return `<button class="wk${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}${i>=5?' we':''}" data-act="pickDay" data-date="${date}"><small>${WD[i]}</small><b class="dn${schedStyle(date).c}"${schedStyle(date).s}>${+date.slice(8)}</b><span class="wdot">${dot}</span></button>`;
 }
 function dayRender(m){
   const t=today();
@@ -1721,7 +1742,7 @@ forms.postDate=(f,fd)=>{
 function pullAdd(){
   const id=ui.open;
   if(id==='day'){openModal({type:'taskNew',date:ui.selDay||today()});return}
-  const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew'};
+  const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew',sched:'schedNew'};
   const b=map[id]&&document.querySelector('#grid [data-act='+map[id]+']')||
     [...document.querySelectorAll('#grid .tile-h button[data-act]')].find(x=>!['blur','close','open','calFull'].includes(x.dataset.act));
   if(b)b.click();else if(map[id]&&acts[map[id]])acts[map[id]]({dataset:{}});
@@ -3030,8 +3051,139 @@ forms.saveBday=(f,fd)=>{
 };
 acts.bdDel=el=>ask('bd-'+el.dataset.id,()=>{store.del('bdays',el.dataset.id);closeModal()});
 
+/* ===== Плитка «График»: рабочие графики по шаблону (2/2, 5/2…), красят дни в календаре ===== */
+const SCHEDPRE=[[2,2],[5,2],[1,3],[3,3],[1,1],[4,2]];
+const addMonths=(s,n)=>{const d=pdate(s);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return ymd(d)};
+function schedOn(g,date){
+  const o=g.ovr&&g.ovr[date];
+  let on=false;
+  if(o&&o.on!==undefined)on=!!o.on;
+  else if(g.start&&date>=g.start&&(!g.until||date<=g.until)){const n=diffDays(g.start,date);on=(n%((+g.work||1)+(+g.off||0)))<(+g.work||1)}
+  if(!on)return null;
+  return {from:(o&&o.from)||g.from||'',to:(o&&o.to)||g.to||'',custom:!!(o&&(o.from||o.to||o.on!==undefined))};
+}
+const schedTime=r=>r.from&&r.to?r.from+'–'+r.to:r.from||r.to||'';
+const schedShort=r=>{const f=x=>(x||'').replace(/:00$/,'');return r.from&&r.to?f(r.from)+'–'+f(r.to):f(r.from||r.to)};
+const schedMarks=date=>S.sched.filter(g=>g.show!==false).map(g=>({g,r:schedOn(g,date)})).filter(x=>x.r);
+function lumOf(c){const m=/^#([0-9a-f]{6})$/i.exec(c||'');if(!m)return .3;const n=parseInt(m[1],16);return (0.299*(n>>16)+0.587*((n>>8)&255)+0.114*(n&255))/255}
+function schedStyle(date){
+  const ms=schedMarks(date);if(!ms.length)return {c:'',s:''};
+  const cols=ms.map(x=>x.g.color||'#888');
+  const bg=cols.length===1?cols[0]:'conic-gradient('+cols.map((c,i)=>`${c} ${i*100/cols.length}% ${(i+1)*100/cols.length}%`).join(',')+')';
+  const fg=cols.reduce((a,c)=>a+lumOf(c),0)/cols.length>0.62?'#1a1a1a':'#fff';
+  return {c:' sch',s:` style="--sbg:${bg};--sfg:${fg}"`};
+}
+function schedRows(date){
+  const ms=schedMarks(date);
+  return ms.length?`<div class="schrows">${ms.map(({g,r})=>`<div class="schrow" style="--c:${g.color}"><i></i><b>${esc(g.name)}</b><span>${esc(schedTime(r))}</span></div>`).join('')}</div>`:'';
+}
+/* ---- плитка ---- */
+function schedBanners(){
+  const t=today();
+  return S.sched.filter(g=>g.until&&diffDays(t,g.until)<=7).map(g=>{
+    const left=diffDays(t,g.until);
+    return `<div class="schban" style="--c:${g.color}"><div>${left<0?'График «'+esc(g.name)+'» закончился':'График «'+esc(g.name)+'» заканчивается'+(left===0?' сегодня':' через '+left+' '+plural(left,'день','дня','дней'))}</div>
+      <div class="fr" style="gap:6px;flex-wrap:wrap"><span class="hint">Продлить на</span>${[1,3,6].map(n=>`<button class="btn sm" data-act="schedExt" data-id="${g.id}" data-n="${n}">${n} мес.</button>`).join('')}</div></div>`}).join('');
+}
+function schedCard(g){
+  const t=today(),w=schedOn(g,t);
+  return `<div class="schcard" role="button" tabindex="0" style="--c:${g.color}" data-act="schedOpen" data-id="${g.id}">
+    <i></i><div class="scn"><b>${esc(g.name)}</b><small>${g.work}/${g.off}${g.from||g.to?' · '+esc(schedTime({from:g.from,to:g.to})):''} · до ${g.until?fmtLong(g.until):'—'}</small>${w?`<small class="scnow">сегодня работа${schedTime(w)?', '+esc(schedTime(w)):''}</small>`:''}</div>
+    <button class="btn sm${g.show===false?'':' primary'}" data-act="schedShow" data-id="${g.id}" title="Показывать в календаре">${g.show===false?'Скрыт':'В календаре'}</button></div>`;
+}
+function schedDetail(g){
+  const v=ui.schedMonth||ymOf(today());
+  const cell=(d,dn)=>{const r=schedOn(g,d);
+    return `<button class="cal-c mini${d===today()?' today':''}" data-act="schedDay" data-id="${g.id}" data-date="${d}"><span class="dn${r?' sch':''}"${r?` style="--sbg:${g.color};--sfg:${lumOf(g.color)>0.62?'#1a1a1a':'#fff'}"`:''}>${dn}</span>${r&&schedTime(r)?`<small class="sct${r.custom?' cu':''}">${esc(schedShort(r))}</small>`:'<small class="sct"></small>'}</button>`};
+  const bk='s:sched:'+g.id;
+  return `<div class="subwrap" style="--c:${g.color}"><div class="subhead"><b>${esc(g.name)}</b><button class="ic sm" data-act="schedEdit" data-id="${g.id}" aria-label="Изменить график" title="Изменить">${ic('edit',13,2)}</button><span class="sp"></span>${blurBtn(bk,1)}<button class="btn sm" data-act="schedBack">${ic('l',12,2)} Назад</button></div>
+    <div class="subbody${blurOn(bk)?' blur':''}"><button class="btn sm${g.show===false?'':' primary'}" data-act="schedShow" data-id="${g.id}" style="align-self:flex-start">${g.show===false?'Не показывать в календаре':'Показывать в календаре'}</button>
+    <div class="navbar"><button class="ic sm" data-act="schedNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="schedNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button></div>
+    ${calGrid(v,cell)}
+    <div class="hint">Нажми на день, чтобы сделать его рабочим или выходным, или поставить другое время. Отмеченные дни: <span class="sct cu">другое время</span></div></div></div>`;
+}
+function schedRender(m){
+  const g=ui.schedSel&&S.sched.find(x=>x.id===ui.schedSel);
+  if(m==='f'&&g)return schedDetail(g);
+  if(!S.sched.length)return `<div class="empty"><b>Графиков пока нет.</b><br>Нажми «+» в заголовке: например «Моя работа» 2/2 с 10:00 до 19:00. Рабочие дни закрасятся в календаре.</div>`;
+  return schedBanners()+S.sched.map(schedCard).join('');
+}
+TILES.push({id:'sched',title:'График',
+  headExtra:()=>`<button class="ic" data-act="schedNew" aria-label="Новый график" title="Новый график">${ic('plus',15,2)}</button>`,
+  meta:()=>{const t=today();return S.sched.some(g=>schedOn(g,t))?'сегодня рабочий':''},
+  render:schedRender});
+acts.schedOpen=el=>{ui.schedSel=el.dataset.id;ui.schedMonth=ymOf(today());if(ui.open!=='sched')ui.open='sched';scheduleRender()};
+acts.schedBack=()=>{ui.schedSel=null;scheduleRender()};
+acts.schedNav=el=>{ui.schedMonth=ymAdd(ui.schedMonth||ymOf(today()),+el.dataset.d);scheduleRender()};
+acts.schedShow=el=>store.upd('sched',el.dataset.id,n=>{n.show=n.show===false});
+acts.schedExt=el=>store.upd('sched',el.dataset.id,n=>{const base=n.until&&n.until>today()?n.until:today();n.until=addMonths(base,+el.dataset.n);toast('График продлён до '+fmtLong(n.until))});
+/* ---- создание и правка графика ---- */
+acts.schedNew=()=>{
+  const used=S.sched.map(g=>g.color);
+  ui.drafts['sg-color']=PALETTE.find(c=>!used.includes(c))||PALETTE[S.sched.length%PALETTE.length];
+  openModal({type:'sched',id:null});
+};
+acts.schedEdit=el=>{const g=S.sched.find(x=>x.id===el.dataset.id);if(!g)return;ui.drafts['sg-color']=g.color;openModal({type:'sched',id:g.id})};
+acts.schedColor=el=>{ui.drafts['sg-color']=el.dataset.c;scheduleRender()};
+chg.schedColorPick=el=>{ui.drafts['sg-color']=el.value;scheduleRender()};
+acts.schedPre=el=>{ui.drafts['sg-work']=el.dataset.w;ui.drafts['sg-off']=el.dataset.o;scheduleRender()};
+MODALS.sched=m=>{
+  const g=m.id?S.sched.find(x=>x.id===m.id):null;
+  if(m.id&&!g)return '<h3>Не найдено</h3>';
+  const fid='sg';const col=ui.drafts['sg-color']||PALETTE[0];
+  const w=ui.drafts['sg-work']??(g?g.work:2),o=ui.drafts['sg-off']??(g?g.off:2);
+  return `<h3>${g?'График':'Новый график'}</h3>
+  <form id="${fid}" data-submit="saveSched" data-id="${g?g.id:''}" style="display:flex;flex-direction:column;gap:12px">
+    <label class="l">Название${fld(fid,'name',{ph:'Например: Моя работа',req:1,af:!g,value:g?g.name:''})}</label>
+    <div class="l">Цвет${swatches(col,'schedColor')}</div>
+    <div class="l">Шаблон<div class="fr" style="gap:6px;flex-wrap:wrap">${SCHEDPRE.map(([a,b])=>`<button type="button" class="btn sm${+w===a&&+o===b?' primary':''}" data-act="schedPre" data-w="${a}" data-o="${b}">${a}/${b}</button>`).join('')}</div></div>
+    <div class="fr"><label class="l">Рабочих подряд${fld(fid,'work',{type:'number',req:1,attrs:'min="1" max="30" inputmode="numeric"',value:String(w)})}</label>
+      <label class="l">Выходных подряд${fld(fid,'off',{type:'number',req:1,attrs:'min="0" max="30" inputmode="numeric"',value:String(o)})}</label></div>
+    <div class="fr"><label class="l">Первый рабочий день${fld(fid,'start',{type:'date',req:1,value:g?g.start:today()})}</label>
+      ${g?`<label class="l">Действует до${fld(fid,'until',{type:'date',req:1,value:g.until||''})}</label>`
+        :`<label class="l">На сколько месяцев<select id="sg-months" name="months" data-draft>${[1,2,3,6,12].map(n=>`<option value="${n}"${String(ui.drafts['sg-months']||3)===String(n)?' selected':''}>${n}</option>`).join('')}</select></label>`}</div>
+    <div class="fr"><div class="l">С${timeFld(fid,'from',g?g.from:'')}</div><div class="l">До${timeFld(fid,'to',g?g.to:'')}</div></div>
+    <label class="chkrow"><input type="checkbox" id="sg-show" name="show" data-draft ${(ui.drafts['sg-show']!==undefined?ui.drafts['sg-show']:(g?g.show!==false:true))?'checked':''}> Показывать в календаре</label>
+    <div class="fr" style="justify-content:space-between"><span class="fr"><button class="btn primary">${g?'Сохранить':'Создать'}</button><button type="button" class="btn" data-act="mclose">Отмена</button></span>${g?delBtn('sg-'+g.id,'schedDel','data-id="'+g.id+'"'):''}</div></form>`;
+};
+forms.saveSched=(f,fd)=>{
+  const name=(fd.name||'').trim();if(!name)return;
+  const work=Math.max(1,+fd.work||1),off=Math.max(0,+fd.off||0);
+  if(!fd.start){toast('Нужна дата первого рабочего дня',1);return}
+  const id=f.dataset.id;
+  const until=fd.until||addDays(addMonths(fd.start,+fd.months||3),-1);
+  const rec={name,color:ui.drafts['sg-color']||PALETTE[0],work,off,start:fd.start,until,from:fd.from||'',to:fd.to||'',show:!!fd.show};
+  if(id)store.upd('sched',id,n=>{Object.assign(n,rec)});
+  else{const ni={id:uid(),...rec,ovr:{},created:Date.now()};store.put('sched',ni);ui.schedSel=ni.id;ui.schedMonth=fd.start.slice(0,7)}
+  clearDrafts('sg');closeModal();
+};
+acts.schedDel=el=>ask('sg-'+el.dataset.id,()=>{store.del('sched',el.dataset.id);if(ui.schedSel===el.dataset.id)ui.schedSel=null;clearDrafts('sg');closeModal()});
+/* ---- отдельный день ---- */
+acts.schedDay=el=>{
+  const g=S.sched.find(x=>x.id===el.dataset.id);if(!g)return;
+  const r=schedOn(g,el.dataset.date);
+  ui.drafts['sd-on']=r?'1':'0';ui.drafts['sd-from']=r?r.from:(g.from||'');ui.drafts['sd-to']=r?r.to:(g.to||'');
+  openModal({type:'schedDay',id:g.id,date:el.dataset.date});
+};
+MODALS.schedDay=m=>{
+  const g=S.sched.find(x=>x.id===m.id);if(!g)return '<h3>Не найдено</h3>';
+  const on=ui.drafts['sd-on']==='1';
+  return `<h3>${esc(g.name)}, ${fmtLong(m.date)}</h3>
+  <form id="sd" data-submit="saveSchedDay" data-id="${g.id}" data-date="${m.date}" style="display:flex;flex-direction:column;gap:12px">
+    <div class="fr"><button type="button" class="btn${on?' primary':''}" data-act="schedDayOn" data-v="1" style="flex:1">Рабочий</button><button type="button" class="btn${on?'':' primary'}" data-act="schedDayOn" data-v="0" style="flex:1">Выходной</button></div>
+    ${on?`<div class="fr"><div class="l">С${timeFld('sd','from',ui.drafts['sd-from']||'')}</div><div class="l">До${timeFld('sd','to',ui.drafts['sd-to']||'')}</div></div>`:''}
+    <div class="fr"><button class="btn primary">Сохранить</button><button type="button" class="btn" data-act="schedDayReset" data-id="${g.id}" data-date="${m.date}">Как по графику</button></div></form>`;
+};
+acts.schedDayOn=el=>{ui.drafts['sd-on']=el.dataset.v;scheduleRender()};
+forms.saveSchedDay=(f,fd)=>{
+  const on=ui.drafts['sd-on']==='1';
+  store.upd('sched',f.dataset.id,n=>{n.ovr=n.ovr||{};n.ovr[f.dataset.date]=on?{on:true,from:fd.from||'',to:fd.to||''}:{on:false}});
+  clearDrafts('sd-');closeModal();
+};
+acts.schedDayReset=el=>{store.upd('sched',el.dataset.id,n=>{if(n.ovr)delete n.ovr[el.dataset.date]});clearDrafts('sd-');closeModal()};
+
 /* ===== Расположение плиток и настройки ===== */
-const DEFSLOTS=['habits','insights','dela','training','spend','docs','subs','goals','trip','notes','bday'];
+const DEFSLOTS=['habits','insights','dela','training','spend','docs','subs','goals','trip','notes','bday','sched'];
 function layoutSlots(){
   const p=S.prefs.find(x=>x.id==='layout');
   let s=[...new Set(((p&&p.slots)||[]).filter(id=>DEFSLOTS.includes(id)))];
