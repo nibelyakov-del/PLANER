@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0d1015"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Планер"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#0d1015"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Планер"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
 <title>Личный планер</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -873,6 +873,40 @@ input[data-combo]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
 
 .tbtns .btn{font-size:11.5px}
 
+/* точка дня: посередине между числом и краем клетки */
+.cal-c.mini>i{right:auto!important;left:75%;transform:translate(-50%,-50%)!important}
+/* строка дела без пустого места слева */
+.crow.nt{grid-template-columns:minmax(0,1fr) auto}
+.crow.nt .time{display:none}
+.crow+.subs,.crow+.subs+.tbtns,.crow+.tbtns{margin-left:0}
+.crow+.subs{padding-left:6px}
+/* только список дел прокручивается */
+.phone .tile.full[data-tile=day] .tile-b{overflow:hidden}
+.phone .tile.full[data-tile=day] .daylist{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px}
+.phone .overbox{max-height:30vh;overflow-y:auto;flex:none}
+.overbox:empty{display:none}
+.daylist{display:contents}
+.phone .daylist{display:flex}
+/* без приближения */
+html,body{touch-action:manipulation}
+.phone input,.phone select,.phone textarea{font-size:16px!important}
+
+body:not(.phone) .tbtns{grid-auto-flow:column;gap:6px;margin:2px 0 8px}
+body:not(.phone) .tbtns .btn{height:32px;flex-direction:row;gap:6px;font-size:12.5px;padding:0 8px}
+body:not(.phone) .tbtns .btn svg{width:14px;height:14px}
+body:not(.phone) .crow{cursor:default}
+body:not(.phone) .tbtns .btn svg{flex:none;width:14px;height:14px;min-width:14px}
+
+/* компьютер: кнопки в одной строке с делом */
+body:not(.phone) .crow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+body:not(.phone) .crow .time{flex:none;min-width:44px}
+body:not(.phone) .crow .tw{flex:1 1 150px;min-width:0}
+body:not(.phone) .crow .r{flex:none}
+body:not(.phone) .crow .tbtns{display:flex;gap:6px;margin:0 0 0 auto;flex:none}
+body:not(.phone) .crow .tbtns .btn{height:28px;padding:0 9px;font-size:12px;width:auto}
+body:not(.phone) .crow.nt .time{display:none}
+body:not(.phone) .crow .tbtns{flex-wrap:wrap;max-width:100%;justify-content:flex-end}
+
 </style>
 <div class="app">
   <header class="top">
@@ -1031,7 +1065,7 @@ function fld(fid,name,o={}){
   const type=o.type||'text';
   const cls=o.cls?` class="${o.cls}"`:'';
   const ph=` placeholder="${esc(o.ph||'')}"`;
-  const ex=(o.attrs?' '+o.attrs:'')+(o.req?' required':'')+(o.af?' data-af':'');
+  const ex=(o.attrs?' '+o.attrs:'')+(o.req?' required':'')+(o.af&&!PHONE.matches?' data-af':'');
   if(type==='textarea')return `<textarea id="${id}" name="${name}" data-draft${ph}${ex}${cls}>${esc(v)}</textarea>`;
   if(type==='date'&&!o.plain)return `<span class="dfield${v?'':' nodate'}"><span class="dtxt">${v?esc(fmtDMY(v)):''}</span><input id="${id}" name="${name}" type="date" value="${esc(v)}" data-draft${ex}${cls}></span>`;
   return `<input id="${id}" name="${name}" type="${type}" value="${esc(v)}" data-draft${ph}${ex}${cls}>`;
@@ -1146,7 +1180,7 @@ function modalHtml(){
   if(!ui.modal)return '';
   const f=MODALS[ui.modal.type];if(!f)return '';
   const inner=f(ui.modal);
-  return `<div class="backdrop" ${ui.modal.type==='docView'?'data-act="mclose"':''}></div><div class="modal ${ui.modal.wide?'wide':''} ${ui.modal.cls||''}" role="dialog" aria-modal="true">${inner}<button class="ic mx" data-act="mclose" aria-label="Закрыть">${ic('x',15)}</button></div>${ui.tpick?tpickHtml():''}`;
+  return `<div class="backdrop" ${ui.modal.type==='docView'?'data-act="mclose"':''}></div><div class="modal ${ui.modal.wide?'wide':''} ${ui.modal.cls||''}" data-scroll="modal" role="dialog" aria-modal="true">${inner}<button class="ic mx" data-act="mclose" aria-label="Закрыть">${ic('x',15)}</button></div>${ui.tpick?tpickHtml():''}`;
 }
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
@@ -1279,7 +1313,7 @@ acts.tpClear=()=>{ui.drafts[ui.tpick.id]='';tpSaved(ui.tpick.id);ui.tpick=null;s
 acts.tpBack=()=>{ui.tpick=null;scheduleRender()};
 acts.goCal=()=>{ui.selDay=today();ui.month=ymOf(today());ui.hc={};ui.open=PHONE.matches?'day':null;scheduleRender()};
 acts.tab=el=>{ui.more=false;ui.hc={};ui.sub[el.dataset.id]=null;ui.open=el.dataset.id;scheduleRender()};
-acts.rowMore=el=>{ui.rowOpen[el.dataset.id]=!ui.rowOpen[el.dataset.id];scheduleRender()};
+acts.rowMore=el=>{const was=!!ui.rowOpen[el.dataset.id];ui.rowOpen=was?{}:{[el.dataset.id]:true};scheduleRender()};
 acts.calFull=()=>{ui.open='day';ui.hc={};ui.calFull=!ui.calFull;scheduleRender()};
 acts.close=()=>{ui.open=null;scheduleRender()};
 acts.mclose=()=>closeModal();
@@ -1384,20 +1418,20 @@ function subsHtml(e){
 }
 /* телефон: компактная задача в календаре, по нажатию 4 кнопки, удержание = выбор для переноса */
 function calTaskRow(e,o,c){
-  const open=!!ui.rowOpen[e.id];
+  const open=!!o.always||!!ui.rowOpen[e.id];
   const frag=(e.subs||[]).length?e.subs[0].t:'';
   const when=o.showDate&&e.date&&e.date<today()?`<span class="when">${fmtShort(e.date)}</span>`:'';
   const buf=ui.buf&&ui.buf.id===e.id;
-  const exp=open?`<div class="subs">${(e.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}"><button class="chk sm ${s.done?'on':''}" style="--c:${c}" data-act="toggleSubtask" data-id="${e.id}" data-sid="${s.id}" aria-label="Подзадача">${ic('check',9,2.4)}</button><span class="subt">${esc(s.t)}</span></div>`).join('')}</div>
-    <div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button>${e.contact?`<button class="btn sm" data-act="contactOpen" data-id="${e.id}">${ic('chat',17,2)}<span>Связаться</span></button>`:''}</div>`:'';
-  return `<div class="item crow${e.done?' done':''}${o.over?' over':''}${e.imp?' imp':''}${open?' open':''}${buf?' buf':''}" style="--c:${c}" data-act="taskTap" data-id="${e.id}" data-press="${e.id}">
+  const btns=`<div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button>${e.contact?`<button class="btn sm" data-act="contactOpen" data-id="${e.id}">${ic('chat',17,2)}<span>Связаться</span></button>`:''}</div>`;
+  const exp=open?`<div class="subs">${(e.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}"><button class="chk sm ${s.done?'on':''}" style="--c:${c}" data-act="toggleSubtask" data-id="${e.id}" data-sid="${s.id}" aria-label="Подзадача">${ic('check',9,2.4)}</button><span class="subt">${esc(s.t)}</span></div>`).join('')}</div>${o.always?'':btns}`:'';
+  return `<div class="item crow${e.time?'':' nt'}${e.done?' done':''}${o.over?' over':''}${e.imp?' imp':''}${open?' open':''}${buf?' buf':''}" style="--c:${c}" data-act="taskTap" data-id="${e.id}" data-press="${e.id}">
     <span class="time">${e.time?esc(e.time):''}</span>
     <span class="tw"><span class="t">${esc(e.title)}</span>${!open&&frag?`<span class="frag">${esc(frag)}</span>`:''}${open&&e.place?`<span class="frag">${esc(e.place)}</span>`:''}</span>
-    <span class="r">${when}${o.noSphere?'':sphChip(e.sphere)}</span></div>${exp}`;
+    <span class="r">${when}${o.noSphere?'':sphChip(e.sphere)}</span>${o.always?btns:''}</div>${(e.subs||[]).length||!o.always?exp:''}`;
 }
 acts.taskTap=el=>{
   if(ui.suppressTap){ui.suppressTap=false;return}
-  ui.rowOpen[el.dataset.id]=!ui.rowOpen[el.dataset.id];scheduleRender();
+  const was=!!ui.rowOpen[el.dataset.id];ui.rowOpen=was?{}:{[el.dataset.id]:true};scheduleRender();
 };
 acts.calDone=el=>{const t=S.tasks.find(x=>x.id===el.dataset.id);if(t)setTaskDone(t.id,!t.done)};
 acts.calRemove=el=>{store.upd('tasks',el.dataset.id,n=>{n.date=null;n.time=''});delete ui.rowOpen[el.dataset.id];toast('Вернул в «Дела»')};
@@ -1519,6 +1553,14 @@ MODALS.contact=m=>`<h3>Связаться</h3><div class="hint">${esc(m.title||'
   <div class="fr" style="gap:10px"><a class="btn primary" style="flex:1;text-align:center;text-decoration:none" href="tel:${esc(m.phone)}">Позвонить</a><a class="btn" style="flex:1;text-align:center;text-decoration:none" href="sms:${esc(m.phone)}">Написать СМС</a></div>
   <div class="fr"><button class="btn" data-act="mclose">Закрыть</button></div>`;
 
+acts.reloadApp=async()=>{
+  try{if('serviceWorker' in navigator){(await navigator.serviceWorker.getRegistrations()).forEach(r=>r.unregister())}}catch(e){}
+  try{if(window.caches){(await caches.keys()).forEach(k=>caches.delete(k))}}catch(e){}
+  if(STANDALONE){const u=new URL(location.href);u.searchParams.set('r',Date.now());location.replace(u.toString())}else location.reload();
+};
+/* запрет увеличения экрана двумя пальцами */
+['gesturestart','gesturechange','gestureend'].forEach(n=>document.addEventListener(n,e=>e.preventDefault(),{passive:false}));
+
 /* ===== Плитка «Календарь»: сверху календарь, снизу выбранный день ===== */
 
 function overdueList(t){
@@ -1551,14 +1593,16 @@ function dayPanel(sel,t){
   const timed=ents.filter(e=>e.time).sort(byTime);
   const untimed=[...ents.filter(e=>!e.time),...early].sort(byTime);
   const soon=isToday?S.docs.filter(d=>d.expires&&d.expires>t&&diffDays(t,d.expires)<=(d.remind??30)&&!d.hideRem):[];
-  h+=secHtml('Просрочено',over.map(e=>entryRow(e,{over:1,showDate:1,cal:PHONE.matches})),'over');
-  h+=secHtml('По времени',timed.map(e=>entryRow(e,{cal:PHONE.matches})));
-  h+=secHtml('Без времени',untimed.map(e=>entryRow(e,{cal:PHONE.matches})));
+  const dl=a=>a.sort((x,y)=>(x.done?1:0)-(y.done?1:0));
+  h+=`<div class="overbox">${secHtml('Просрочено',dl(over).map(e=>entryRow(e,{over:1,showDate:1,cal:1,always:!PHONE.matches})),'over')}</div><div class="daylist" data-scroll="daylist">`;
+  h+=secHtml('По времени',dl(timed).map(e=>entryRow(e,{cal:1,always:!PHONE.matches})));
+  h+=secHtml('Без времени',dl(untimed).map(e=>entryRow(e,{cal:1,always:!PHONE.matches})));
   if(soon.length)h+=`<div class="sec"><div class="sec-h">Скоро истекает<b>${soon.length}</b></div>${soon.sort((a,b)=>a.expires.localeCompare(b.expires)).map(d=>`<div class="item" style="--c:${sphereColor(d.sphere)}"><span class="chk sm" style="border-color:var(--accent)"></span><span class="time"></span><span class="t">${esc(d.title)}</span><span class="r"><span class="pill warn">через ${diffDays(t,d.expires)} дн.</span><button class="btn sm" data-act="docHide" data-id="${d.id}">Скрыть</button></span></div>`).join('')}</div>`;
   if(!over.length&&!timed.length&&!untimed.length&&!soon.length)
     h+=past?'':`<div class="empty"><b>На этот день пусто.</b><br>Нажми «Задача», чтобы записать дело со временем.</div>`;
   if(sel<=t)h+=dayExtras(sel);
   if(past&&!h.includes('class="sec"')&&!h.includes('class="hline'))h+='<div class="empty">В этот день записей нет.</div>';
+  h+='</div>';
   return h;
 }
 
@@ -1617,10 +1661,12 @@ acts.pickDay=el=>{
 acts.taskNew=el=>openModal({type:'taskNew',date:el.dataset.date||ui.selDay||today()});
 const impBox=(attrs,on)=>`<label class="impbox${on?' on':''}" title="Суперважное" aria-label="Суперважное"><input type="checkbox" ${attrs} ${on?'checked':''}><span>!</span></label>`;
 /* «Нужно связаться?»: выключено по умолчанию; включённое показывает поле номера или ссылки */
+const hasPicker=()=>!!(navigator.contacts&&navigator.contacts.select);
+acts.contactPick=async el=>{try{const r=await navigator.contacts.select(['tel'],{multiple:false});const n=r&&r[0]&&r[0].tel&&r[0].tel[0];if(n){const id=el.dataset.fid+'-contact';ui.drafts[id]=n;const i=document.getElementById(id);if(i){i.value=n;i.dispatchEvent(new Event('change',{bubbles:true}))}scheduleRender()}}catch(e){}};
 function contactBlock(fid,value){
   const on=ui.drafts[fid+'-cton']!==undefined?ui.drafts[fid+'-cton']:!!value;
   return on?`<label class="l">Номер телефона или ссылка${fld(fid,'contact',{ph:'+7 900 000-00-00 или t.me/ник',value,attrs:'inputmode="url"'})}</label>
-    <button type="button" class="btn sm" data-act="contactToggle" data-fid="${fid}" style="align-self:flex-start">Связываться не нужно</button>`
+    <div class="fr" style="gap:6px;flex-wrap:wrap">${hasPicker()?`<button type="button" class="btn sm" data-act="contactPick" data-fid="${fid}">Выбрать из контактов</button>`:''}<button type="button" class="btn sm" data-act="contactToggle" data-fid="${fid}">Связываться не нужно</button></div>`
     :`<button type="button" class="btn sm" data-act="contactToggle" data-fid="${fid}" style="align-self:flex-start">Нужно ли связаться?</button>`;
 }
 acts.contactToggle=el=>{const k=el.dataset.fid+'-cton';const cur=ui.drafts[k];
@@ -3287,6 +3333,7 @@ MODALS.settings=()=>{
     <button class="setrow" data-act="setPage" data-p="layout"><span>Расположение плиток</span><small>перестановка плиток</small>${ic('r',14,2)}</button>
     <button class="setrow" data-act="setPage" data-p="skin"><span>Дизайн</span><small>${SKINS.find(k=>k.id===curSkin()).name}</small>${ic('r',14,2)}</button>
     <button class="setrow" data-act="syncOpen"><span>Синхронизация</span><small>${SYNC.label()}</small>${ic('r',14,2)}</button>
+    <button class="setrow" data-act="reloadApp"><span>Обновить приложение</span><small>загрузить свежую версию</small>${ic('r',14,2)}</button>
     <button class="setrow" data-act="backupSave"><span>Сохранить копию</span><small>данные и фото в файл</small></button>
     <button class="setrow" data-act="backupLoad"><span>Загрузить копию</span><small>из файла .json</small></button>
     <div class="setrow dis" aria-disabled="true"><span>Язык</span><small>Русский · смена языка появится позже</small></div></div>`;
