@@ -788,7 +788,7 @@ input[data-combo]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
 .crow.open{background:var(--hov)}
 .crow+.subs,.crow+.subs+.tbtns,.crow+.tbtns{margin-left:50px}
 .crow+.subs .sub span.subt{color:var(--fg3)}
-.tbtns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 10px 0}
+.tbtns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;margin:6px 0 10px 0}
 .tbtns .btn{padding:6px 2px;font-size:12px;min-width:0;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:1}.tbtns .btn span{display:block}
 
 .modal input[type=date],.tfield{height:40px!important;min-height:40px;box-sizing:border-box;width:100%;line-height:38px}
@@ -865,6 +865,14 @@ input[data-combo]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
 .cal-c.mini:has(.sct){flex-direction:column;gap:1px}
 .chkrow{display:flex;align-items:center;gap:8px;font-size:14px}
 
+.subwrap{flex:1 0 auto}
+.subbody>*{flex-shrink:0}
+.phlay{display:flex;flex-direction:column;gap:6px}
+.phlay .slot{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;min-height:44px}
+.phlay .slot small{width:20px;color:var(--fg3);font-family:var(--mono)}
+
+.tbtns .btn{font-size:11.5px}
+
 </style>
 <div class="app">
   <header class="top">
@@ -931,6 +939,7 @@ const IC={
   l:'<path d="M10 3L5 8l5 5"/>',
   r:'<path d="M6 3l5 5-5 5"/>',
   arr:'<path d="M3 8h9M8.5 4l4 4-4 4"/>',
+  chat:'<path d="M2.5 4a1.5 1.5 0 011.5-1.5h8A1.5 1.5 0 0113.5 4v5a1.5 1.5 0 01-1.5 1.5H7L4 13v-2.5H4A1.5 1.5 0 012.5 9z"/>',
   undo:'<path d="M3 8a5 5 0 105-5H5M5.5 1L3 3.2 5.5 5.5"/>',
   out:'<path d="M2.5 9.5V12a1 1 0 001 1h9a1 1 0 001-1V9.5M8 2.5v7M5 6.5l3 3 3-3"/>'
 };
@@ -1157,7 +1166,14 @@ const TABIC={
  trip:'<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5h6v3M4 13h16"/>',
  notes:'<path d="M5 4h14v12H9l-4 4z"/>',
  bday:'<rect x="4" y="10" width="16" height="10" rx="1"/><path d="M3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-4 0M12 7c2-4 6-3 4 0"/>'};
-function phoneTabIds(){const rest=layoutSlots().filter(id=>!PHONE_TABS.includes(id));return PHONE_TABS.concat(rest)}
+function phoneTabIds(){
+  const all=['day',...DEFSLOTS].filter(id=>tileById(id));
+  const base=PHONE_TABS.concat(layoutSlots().filter(id=>!PHONE_TABS.includes(id)));
+  const p=S.prefs.find(x=>x.id==='layoutPhone');
+  let s=[...new Set(((p&&p.slots)||[]).filter(id=>all.includes(id)))];
+  base.forEach(id=>{if(all.includes(id)&&!s.includes(id))s.push(id)});
+  return s;
+}
 function phoneTabbar(){
   return phoneTabIds().map(id=>{const t=tileById(id);if(!t)return '';
     return `<button class="tab${ui.open===id?' on':''}" data-act="tab" data-id="${id}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[id]||''}</svg><span>${esc(TABLBL[id]||t.title)}</span></button>`}).join('');
@@ -1273,7 +1289,7 @@ acts.noop=()=>{};
 function addHist(r){store.put('history',{...r,date:r.date||today(),at:new Date().toISOString()})}
 const histDel=id=>store.del('history',id);
 
-function taskEntry(t){return{kind:'task',id:t.id,title:t.title,time:t.time||'',date:t.date,sphere:t.sphere,done:!!t.done,imp:!!t.imp,place:t.place||'',subs:t.subs||[]}}
+function taskEntry(t){return{kind:'task',id:t.id,title:t.title,time:t.time||'',date:t.date,sphere:t.sphere,done:!!t.done,imp:!!t.imp,place:t.place||'',contact:t.contact||'',subs:t.subs||[]}}
 function subEntry(g,s){return{kind:'gsub',id:g.id,sid:s.id,title:s.t,time:s.time||'',date:s.date,sphere:g.sphere,done:!!s.done,goal:g.title}}
 function progDayFor(p,date){
   const i=(p.weekdays||[]).indexOf(wdOf(date));
@@ -1373,7 +1389,7 @@ function calTaskRow(e,o,c){
   const when=o.showDate&&e.date&&e.date<today()?`<span class="when">${fmtShort(e.date)}</span>`:'';
   const buf=ui.buf&&ui.buf.id===e.id;
   const exp=open?`<div class="subs">${(e.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}"><button class="chk sm ${s.done?'on':''}" style="--c:${c}" data-act="toggleSubtask" data-id="${e.id}" data-sid="${s.id}" aria-label="Подзадача">${ic('check',9,2.4)}</button><span class="subt">${esc(s.t)}</span></div>`).join('')}</div>
-    <div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button></div>`:'';
+    <div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button>${e.contact?`<button class="btn sm" data-act="contactOpen" data-id="${e.id}">${ic('chat',17,2)}<span>Связаться</span></button>`:''}</div>`:'';
   return `<div class="item crow${e.done?' done':''}${o.over?' over':''}${e.imp?' imp':''}${open?' open':''}${buf?' buf':''}" style="--c:${c}" data-act="taskTap" data-id="${e.id}" data-press="${e.id}">
     <span class="time">${e.time?esc(e.time):''}</span>
     <span class="tw"><span class="t">${esc(e.title)}</span>${!open&&frag?`<span class="frag">${esc(frag)}</span>`:''}${open&&e.place?`<span class="frag">${esc(e.place)}</span>`:''}</span>
@@ -1485,6 +1501,24 @@ document.addEventListener('change',e=>{const b=e.target.closest&&e.target.closes
   window.addEventListener('scroll',()=>{if(box)close()},true);
 })();
 
+/* связаться: ссылка открывается сразу, номер даёт выбор «позвонить / СМС» */
+function contactKind(s){
+  s=(s||'').trim();
+  if(/^[+\d\s()\-.]{5,}$/.test(s)){let n=s.replace(/[^\d+]/g,'');if(/^8\d{10}$/.test(n))n='+7'+n.slice(1);else if(/^7\d{10}$/.test(n))n='+'+n;else if(/^\d{10}$/.test(n))n='+7'+n;return {phone:n}}
+  if(/^@[\w.]+$/.test(s))return {url:'https://t.me/'+s.slice(1)};
+  if(/^[a-z][a-z0-9+.-]*:\/\//i.test(s))return {url:s};
+  return {url:'https://'+s.replace(/^\/+/,'')};
+}
+acts.contactOpen=el=>{
+  const t=S.tasks.find(x=>x.id===el.dataset.id);if(!t||!t.contact)return;
+  const k=contactKind(t.contact);
+  if(k.url){const u=safeUrl(k.url);if(u)window.open(u,'_blank','noopener');else toast('Не похоже на ссылку',1);return}
+  openModal({type:'contact',phone:k.phone,title:t.title});
+};
+MODALS.contact=m=>`<h3>Связаться</h3><div class="hint">${esc(m.title||'')} · ${esc(m.phone)}</div>
+  <div class="fr" style="gap:10px"><a class="btn primary" style="flex:1;text-align:center;text-decoration:none" href="tel:${esc(m.phone)}">Позвонить</a><a class="btn" style="flex:1;text-align:center;text-decoration:none" href="sms:${esc(m.phone)}">Написать СМС</a></div>
+  <div class="fr"><button class="btn" data-act="mclose">Закрыть</button></div>`;
+
 /* ===== Плитка «Календарь»: сверху календарь, снизу выбранный день ===== */
 
 function overdueList(t){
@@ -1582,6 +1616,16 @@ acts.pickDay=el=>{
 /* ---------- новая задача (дата и время обязательны) ---------- */
 acts.taskNew=el=>openModal({type:'taskNew',date:el.dataset.date||ui.selDay||today()});
 const impBox=(attrs,on)=>`<label class="impbox${on?' on':''}" title="Суперважное" aria-label="Суперважное"><input type="checkbox" ${attrs} ${on?'checked':''}><span>!</span></label>`;
+/* «Нужно связаться?»: выключено по умолчанию; включённое показывает поле номера или ссылки */
+function contactBlock(fid,value){
+  const on=ui.drafts[fid+'-cton']!==undefined?ui.drafts[fid+'-cton']:!!value;
+  return on?`<label class="l">Номер телефона или ссылка${fld(fid,'contact',{ph:'+7 900 000-00-00 или t.me/ник',value,attrs:'inputmode="url"'})}</label>
+    <button type="button" class="btn sm" data-act="contactToggle" data-fid="${fid}" style="align-self:flex-start">Связываться не нужно</button>`
+    :`<button type="button" class="btn sm" data-act="contactToggle" data-fid="${fid}" style="align-self:flex-start">Нужно ли связаться?</button>`;
+}
+acts.contactToggle=el=>{const k=el.dataset.fid+'-cton';const cur=ui.drafts[k];
+  const on=cur!==undefined?cur:false;
+  ui.drafts[k]=!on;if(on)ui.drafts[el.dataset.fid+'-contact']='';scheduleRender()};
 MODALS.taskNew=m=>{
   const fid='tn';
   const imp=ui.drafts[fid+'-imp']!==undefined?ui.drafts[fid+'-imp']:false;
@@ -1593,12 +1637,13 @@ MODALS.taskNew=m=>{
     <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)${sphereSel(fid,'')}</label>${impBox(`id="${fid}-imp" name="imp" data-draft`,imp)}</div>
     <label class="l">Подзадача (необязательно)${fld(fid,'sub',{type:'textarea',ph:'Текст подзадачи или заметка'})}</label>
     <label class="l">Место (необязательно)${fld(fid,'place',{ph:'Например: Студия, ул. Ленина 5'})}</label>
+    ${contactBlock(fid,'')}
     <div class="fr"><button class="btn primary">Добавить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
 };
 forms.addTask=(f,fd)=>{
   const title=(fd.title||'').trim();if(!title)return;
   if(!fd.date){toast('Нужна дата',1);return}
-  store.put('tasks',{id:uid(),title,date:fd.date,time:fd.time||'',sphere:resolveSphere(fd.sphere),imp:fd.imp!==undefined,place:(fd.place||'').trim(),subs:(fd.sub||'').trim()?[{id:uid(),t:fd.sub.trim(),done:false}]:[],done:false});
+  store.put('tasks',{id:uid(),title,date:fd.date,time:fd.time||'',sphere:resolveSphere(fd.sphere),imp:fd.imp!==undefined,place:(fd.place||'').trim(),contact:(fd.contact||'').trim(),subs:(fd.sub||'').trim()?[{id:uid(),t:fd.sub.trim(),done:false}]:[],done:false});
   ui.selDay=fd.date;ui.month=ymOf(fd.date);
   clearDrafts('tn-');closeModal();
 };
@@ -1615,6 +1660,7 @@ MODALS.task=m=>{
   <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="taskField" data-id="${t.id}" data-f="sphere" value="${esc(sphereName(t.sphere))}"></label>
     ${impBox(`id="${fid}-imp" data-chg="taskField" data-id="${t.id}" data-f="imp"`,!!t.imp)}</div>
   <label class="l">Место<input id="${fid}-place" data-chg="taskField" data-id="${t.id}" data-f="place" value="${esc(t.place||'')}" placeholder="Адрес или название"></label>
+  ${t.contact||ui.drafts[fid+'-cton']?`<label class="l">Связаться: номер телефона или ссылка<input id="${fid}-contact" data-chg="taskField" data-id="${t.id}" data-f="contact" value="${esc(t.contact||'')}" placeholder="+7 900 000-00-00 или t.me/ник" inputmode="url"></label>`:`<button type="button" class="btn sm" data-act="contactEditOn" data-fid="${fid}" style="align-self:flex-start">Нужно ли связаться?</button>`}
   <div class="sec"><div class="sec-h">Подзадачи<b>${(t.subs||[]).length}</b></div>
     ${(t.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}" style="padding:3px 0">
       <button class="chk sm ${s.done?'on':''}" style="--c:${sphereColor(t.sphere)}" data-act="toggleSubtask" data-id="${t.id}" data-sid="${s.id}">${ic('check',9,2.4)}</button>
@@ -1639,6 +1685,7 @@ chg.taskField=el=>{
     if(f==='title'){if(v.trim())n.title=v.trim()}
     else if(f==='imp')n.imp=el.checked;
     else if(f==='place')n.place=v.trim();
+    else if(f==='contact')n.contact=v.trim();
   });
 };
 function saveSched(id){
@@ -1764,6 +1811,8 @@ document.addEventListener('scroll',e=>{
     ui.wkFor=ui.selDay||today();ui.wkOff=(ui.wkOff||0)+(idx===0?-1:1);scheduleRender();
   },90);
 },true);
+
+acts.contactEditOn=el=>{ui.drafts[el.dataset.fid+'-cton']=true;scheduleRender()};
 
 /* ===== Плитка «Привычки» ===== */
 const habitsSorted=()=>S.habits.slice().sort((a,b)=>((a.kind==='not')-(b.kind==='not'))||((a.ord??1e6)-(b.ord??1e6)));
@@ -3213,6 +3262,12 @@ acts.setSkin=el=>store.put('prefs',{id:'theme',v:el.dataset.id});
 MODALS.settings=()=>{
   const p=ui.setPage;
   const back=`<button class="btn sm" data-act="setPage" data-p="">${ic('l',12,2)} Настройки</button>`;
+  if(p==='layout'&&PHONE.matches){
+    const s=phoneTabIds();
+    return `<div class="fr">${back}</div><h3>Нижнее меню</h3>
+    <div class="hint">Нажми на плитку, потом на другую, и они поменяются местами. Порядок такой же, как в нижней полоске, слева направо.</div>
+    <div class="phlay">${s.map((id,i)=>{const t=tileById(id);return `<button class="slot${ui.swapSel===i?' sel':''}" data-act="phSlotPick" data-i="${i}"><small>${i+1}</small>${esc(t?t.title:id)}</button>`}).join('')}</div>`;
+  }
   if(p==='layout'){
     const s=layoutSlots();
     return `<div class="fr">${back}</div><h3>Расположение плиток</h3>
@@ -3261,6 +3316,14 @@ document.addEventListener('drop',e=>{
   e.preventDefault();swapSlots(dragSlot,+el.dataset.slot);dragSlot=null;ui.swapSel=null;scheduleRender();
 });
 document.addEventListener('dragend',()=>{dragSlot=null});
+
+acts.phSlotPick=el=>{
+  const i=+el.dataset.i;
+  if(ui.swapSel==null){ui.swapSel=i;scheduleRender();return}
+  if(ui.swapSel===i){ui.swapSel=null;scheduleRender();return}
+  const s=phoneTabIds();const t=s[ui.swapSel];s[ui.swapSel]=s[i];s[i]=t;
+  ui.swapSel=null;store.put('prefs',{id:'layoutPhone',slots:s});
+};
 
 /* ---------- резервная копия (данные + фото) ---------- */
 const b64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});
