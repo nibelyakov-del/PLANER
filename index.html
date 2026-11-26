@@ -917,6 +917,68 @@ body.mo{overflow:hidden;position:relative}
 .modal{overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .phrow .slot,.phlay .slot{flex-direction:row!important;justify-content:flex-start!important;align-items:center;height:auto!important;min-height:44px;padding:8px 12px;text-align:left}
 
+/* шапка календаря */
+.datebtn{background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent);border-radius:10px;padding:0 12px;height:34px;font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:calc(100% - 110px)}
+.datebtn span{font-size:11px;margin-left:2px}
+.eqb{width:96px;height:34px;justify-content:center;padding:0}
+.daytile .dayhead .btn.primary{width:96px;height:34px;justify-content:center;padding:0}
+/* метки в клетках месяца не обрезаются */
+.cal-c.mini{overflow:visible}
+.cal-c.mini .dn.sch{height:min(26px,calc(100% - 4px));min-height:0;min-width:0;padding:0 7px!important;border-radius:999px;box-sizing:border-box}
+.cal-c.mini.bd .dn{box-shadow:inset 0 0 0 2px #e86fa8!important;border-radius:999px;padding:0 7px;height:min(26px,calc(100% - 4px));display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+.cal-c.mini.bd .dn.sch{box-shadow:inset 0 0 0 2px #e86fa8!important}
+/* цикл */
+.cyhead{font-size:17px;font-weight:600;display:flex;flex-direction:column;gap:2px}
+.cyhead small{font-size:12.5px;font-weight:400;color:var(--fg2)}
+.cybtns{gap:8px}
+.cal-c.cyc{position:relative}
+.cal-c.cyc.cp .dn{background:#d9486a;color:#fff;border-radius:999px;padding:0 7px}
+.cal-c.cyc.cq .dn{box-shadow:inset 0 0 0 1.5px #d9486a;border-radius:999px;padding:0 7px;color:#d9486a}
+.cal-c.cyc.cf .dn{background:color-mix(in srgb,#4aa8e8 28%,transparent);border-radius:999px;padding:0 7px}
+.cal-c.cyc.co .dn{background:#4aa8e8;color:#fff;border-radius:999px;padding:0 7px}
+.cal-c.cyc>i{position:absolute;bottom:3px;left:50%;width:4px;height:4px;border-radius:50%;background:var(--fg3);transform:translateX(-50%)}
+.cylegend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--fg3)}
+.cylegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.cylegend .lp{background:#d9486a}.cylegend .lq{box-shadow:inset 0 0 0 1.5px #d9486a}.cylegend .lf{background:color-mix(in srgb,#4aa8e8 35%,transparent)}.cylegend .lo{background:#4aa8e8}
+.cyday{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px}
+.cyt{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.cyday textarea{width:100%;box-sizing:border-box}
+.chip.on{background:color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent)}
+.cystat{font-size:13px;color:var(--fg2)}
+.cyhist{display:flex;flex-direction:column;gap:4px}
+.cyrow{display:flex;gap:12px;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
+.cyrow b{flex:1}
+
+.cal:has(.cyc){grid-template-rows:auto!important;grid-auto-rows:40px}
+.navbar b{white-space:nowrap}
+.navbar .eqb{width:auto;padding:0 10px}
+.cal:has(.cyc){flex:none!important;height:auto!important;max-height:none!important}
+
+/* ===== единые размеры (стандарты) ===== */
+:root{--sq:30px;--bh:30px;--bhs:26px;--ih:30px;--ihl:70px}
+.phone{--sq:40px;--bh:40px;--bhs:32px;--ih:40px;--ihl:96px}
+/* кнопки: квадрат / обычная / малая / во всю ширину */
+.btn{height:var(--bh)}
+.btn.sm{height:var(--bhs)}
+.btn.block{display:flex;width:100%;height:var(--bh);margin:0 0 10px}
+.ic.sq,.btn.sq{width:var(--sq);height:var(--sq);min-width:var(--sq);min-height:var(--sq);padding:0;border:1px solid var(--line);background:var(--panel2);border-radius:7px;display:inline-grid;place-items:center;flex:none}
+.ic.sq.del{color:var(--fg2);margin-left:auto}
+.ic.sq.del:hover{color:var(--danger);border-color:var(--danger)}
+.btn.danger.sq-h{height:var(--sq)}
+.phone .ic.sq{min-width:var(--sq);min-height:var(--sq)}
+/* поля: малое / среднее (обычное) / большое */
+input,select{height:var(--ih)}
+textarea{min-height:var(--ihl)}
+.modal input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]),.modal select{height:var(--ih)}
+.phone .modal input:not([type=checkbox]):not([type=radio]):not([type=color]),.phone .modal select{min-height:var(--ih)!important;height:var(--ih)}
+.divl{height:1px;background:var(--line);margin:6px 0 8px}
+.hline[class]{margin-bottom:0}
+div.hline{cursor:default}
+/* окно выбора времени: градиент суток по часам */
+.tpop .tp{padding:8px;border-radius:11px}
+.tpop .tp-h,.tpop .tp-mb{background:rgba(8,10,30,.38);border-color:rgba(255,255,255,.22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tpop .tp-h.on{background:rgba(255,255,255,.28);border-color:#fff;color:#fff}
+
 </style>
 <div class="app">
   <header class="top">
@@ -997,7 +1059,7 @@ function blurBtn(k,txt){
 const PALETTE=['#4fc3b0','#e8b04a','#6aa3f0','#a58bf0','#8cc152','#e68ab8','#ef8a4d','#5cc8e8','#c3d84e','#c9a0dc','#7fd1a0','#d9916b'];
 
 /* ================= state ================= */
-const COLL=['spheres','tasks','habits','programs','sessions','body','ideas','shop','goals','docs','history','insights','cats','tcats','dcats','subs','mand','trips','tgroups','tripitems','notecats','notes','bdays','sched','prefs'];
+const COLL=['spheres','tasks','habits','programs','sessions','body','ideas','shop','goals','docs','history','insights','cats','tcats','dcats','subs','mand','trips','tgroups','tripitems','notecats','notes','bdays','sched','cyc','cycn','prefs'];
 const S={};COLL.forEach(c=>S[c]=[]);
 const ui={buf:null,suppressTap:false,mandBlk:{},tpick:null,open:null,more:false,calFull:false,rowOpen:{},modal:null,drafts:{},confirm:null,loaded:{},slow:false,storeErr:'',
   month:null,selDay:null,hMonth:null,histMonth:null,histDay:null,histSphere:'',histQ:'',
@@ -1087,13 +1149,24 @@ function timeFld(fid,name,value){
   const v=ui.drafts[id]!==undefined?ui.drafts[id]:(value||'');
   return `<input type="hidden" id="${id}" name="${name}" value="${esc(v)}" data-draft><button type="button" class="tfield${v?'':' empty'}" data-act="tpOpen" data-id="${id}">${v?esc(v):''}</button>`;
 }
+function tpGrad(){
+  const d=new Date(),doy=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  const dec=23.44*Math.sin(2*Math.PI*(doy-81)/365)*Math.PI/180,lat=54.2*Math.PI/180;
+  const c=Math.max(-1,Math.min(1,-Math.tan(lat)*Math.tan(dec)));
+  const day=2*Math.acos(c)*180/Math.PI/15;
+  const rise=12-day/2,set=12+day/2,p=h=>(Math.max(0,Math.min(24,h))/24*100).toFixed(1)+'%';
+  const k=(day-7)/10;/* 0 зимой .. 1 летом */
+  const mix=(a,b)=>a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',');
+  const sky=mix([120,160,205],[70,170,235]);
+  return `linear-gradient(to bottom right,#0d1236 0%,#0d1236 ${p(rise-1.5)},rgb(224,138,90) ${p(rise)},rgb(${sky}) ${p(rise+2)},rgb(${sky}) ${p(set-2)},rgb(196,82,124) ${p(set)},#0d1236 ${p(set+1.5)},#0d1236 100%)`;
+}
 function tpickHtml(){
   const tp=ui.tpick;const rows=[];
   for(let r=0;r<4;r++){
     rows.push(`<div class="tp-row">${Array.from({length:6},(_,i)=>{const h=r*6+i;return `<button type="button" class="tp-h${tp.h===h?' on':''}" data-act="tpHour" data-h="${h}" data-tph="${h}">${pad(h)}:00</button>`}).join('')}</div>`);
     if(tp.h!==null&&Math.floor(tp.h/6)===r)rows.push(`<div class="tp-row tp-m">${[10,20,30,40,50].map(m=>`<button type="button" class="tp-mb" data-act="tpMin" data-v="${pad(tp.h)}:${pad(m)}">${pad(tp.h)}:${pad(m)}</button>`).join('')}</div>`);
   }
-  return `<div class="tpback" data-act="tpBack"></div><div class="tpop" role="dialog"><div class="tp">${rows.join('')}</div>
+  return `<div class="tpback" data-act="tpBack"></div><div class="tpop" role="dialog"><div class="tp" style="background:${tpGrad()}">${rows.join('')}</div>
   <div class="tp-hint">Нажми на час — выбрано. Задержи палец — покажу минуты.</div>
   <div class="fr"><button type="button" class="btn sm" data-act="tpClear">Без времени</button><button type="button" class="btn sm" data-act="tpBack">Закрыть</button></div></div>`;
 }
@@ -1114,15 +1187,15 @@ function ask(key,fn){
   setTimeout(()=>{if(ui.confirm===key){ui.confirm=null;scheduleRender()}},4000);
 }
 const delBtn=(key,act,attrs,label='')=>ui.confirm===key
-  ?`<button class="btn danger sm" data-act="${act}" ${attrs}>Удалить?</button>`
-  :`<button class="ic sm" data-act="${act}" ${attrs} aria-label="Удалить" title="Удалить">${ic('trash',13)}</button>`;
+  ?`<button class="btn danger sq-h" data-act="${act}" ${attrs}>Удалить?</button>`
+  :`<button class="ic sq del" data-act="${act}" ${attrs} aria-label="Удалить" title="Удалить">${ic('trash',14)}</button>`;
 
 const plural=(n,a,b,c)=>{const m=n%100,k=n%10;return m>10&&m<20?c:k===1?a:k>1&&k<5?b:c};
 const daysIn=ym=>{const [y,m]=ym.split('-').map(Number);return new Date(y,m,0).getDate()};
 const subDate=(s,ym)=>ym+'-'+pad(Math.min(Math.max(1,+s.day||1),daysIn(ym)));
 const subOn=(s,date)=>{const ym=date.slice(0,7);return ym>=(s.created||'0000-00').slice(0,7)&&subDate(s,ym)===date};
 const subPaid=(s,ym)=>!!(s.paid||{})[ym];
-const subEntry2=(s,date)=>({kind:'sub',id:s.id,ym:date.slice(0,7),title:subTitle(s),time:s.time||'09:00',date,sphere:null,done:subPaid(s,date.slice(0,7)),amount:s.amount,color:'var(--accent)'});
+const subEntry2=(s,date)=>({kind:'sub',id:s.id,ym:date.slice(0,7),title:subTitle(s),time:'',date,sphere:null,done:subPaid(s,date.slice(0,7)),amount:s.amount,color:'var(--accent)'});
 const subTitle=s=>/^оплат/i.test(s.name)?s.name:'Оплата: '+s.name;
 function setSubPaid(id,ym,on){
   const s=S.subs.find(x=>x.id===id);if(!s)return;
@@ -1173,6 +1246,12 @@ function calGrid(v,cell){
 const TILES=[];const MODALS={};
 const tileById=id=>TILES.find(t=>t.id===id);
 let rq=false,pendingRender=false;
+function flushRender(){
+  rq=false;render();
+  if(ui.pullFocus){ui.pullFocus=false;
+    const f=document.querySelector('#modal [data-af]')||document.querySelector('#modal input:not([type=hidden]):not([type=checkbox]):not([type=date]):not([type=color]),#modal textarea');
+    if(f){try{f.focus({preventScroll:true})}catch(_){f.focus()}}}
+}
 function scheduleRender(){
   if(rq)return;rq=true;
   requestAnimationFrame(()=>{rq=false;if(ui.dragging){pendingRender=true;return}render()});
@@ -1195,8 +1274,9 @@ function modalHtml(){
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
 const PHONE_TABS=['day','sched','dela','habits','spend'];
-const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Мысли',bday:'Дни рожд.',sched:'График'};
+const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Мысли',bday:'Дни рожд.',sched:'График',cycle:'Цикл'};
 const TABIC={
+ cycle:'<path d="M12 3.5c3 4 5.5 6.6 5.5 10a5.5 5.5 0 11-11 0c0-3.4 2.5-6 5.5-10z"/>',
  sched:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 14h3M13 14h3M8 17h3"/>',
  day:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
  dela:'<path d="M5 7l2 2 3-3M5 15l2 2 3-3M13 8h6M13 16h6"/>',
@@ -1299,7 +1379,7 @@ function openModal(m){ui.modal=m;ui.focusModal=true;scheduleRender()}
 function closeModal(){
   ui.tpick=null;
   const m=ui.modal;ui.modal=null;
-  const P={sched:'sg',schedDay:'sd-',doc:'dc-',spendNew:'sn-',delaNew:'dn-',subNew:'sbn',taskNew:'tn-',habitNew:'hn-',subscrNew:'sc-',postpone:'pp-',bday:'bd-'};if(m&&P[m.type])clearDrafts(P[m.type]);
+  const P={cycStart:'cs-',cycEnd:'ce-',cycSet:'cz-',sched:'sg',schedDay:'sd-',doc:'dc-',spendNew:'sn-',delaNew:'dn-',subNew:'sbn',taskNew:'tn-',habitNew:'hn-',subscrNew:'sc-',postpone:'pp-',bday:'bd-'};if(m&&P[m.type])clearDrafts(P[m.type]);
   if(m&&m.type==='task')clearDrafts('tk-'+m.id+'-');
   if(m&&m.cleanup)m.cleanup();
   scheduleRender();
@@ -1587,11 +1667,12 @@ function secHtml(label,items,cls=''){
   if(!items.length)return '';
   return `<div class="sec"><div class="sec-h ${cls}">${label}<b>${items.length}</b></div>${items.join('')}</div>`;
 }
-function habitPlate(date){
+function habitPlate(date,inTile){
   const ps=S.habits.filter(h=>habitPlanned(h,date));
   if(!ps.length)return '';
   const ok=ps.filter(h=>(h.marks||{})[date]===1).length;
   const unm=ps.filter(h=>(h.marks||{})[date]===undefined).length;
+  if(inTile)return `<div class="hline ${unm?'warn':'okk'}"><span>Привычки: выполнено ${ok} из ${ps.length}</span><b>${unm?'не отмечено '+unm:'все отмечены'}</b></div>`;
   return `<button class="hline ${unm?'warn':'okk'}" data-act="open" data-id="habits"><span>Привычки: выполнено ${ok} из ${ps.length}</span><b>${unm?'не отмечено '+unm:'все отмечены'}</b></button>`;
 }
 function dayPanel(sel,t){
@@ -1599,7 +1680,7 @@ function dayPanel(sel,t){
   let h=`<div class="dayhead"><div class="dayh">${isToday?'Сегодня, ':''}${fmtLong(sel)}<small>${WDS[pdate(sel).getDay()]}</small></div>
     <button class="btn sm primary" data-act="taskNew" data-date="${sel}" aria-label="Новая задача" title="Новая задача">${ic('plus',13,2.4)} Задача</button></div>`;
   h+=schedRows(sel);
-  if(sel<=t)h+=habitPlate(sel);
+  if(sel<=t){const hp=habitPlate(sel);if(hp)h+=hp+'<div class="divl"></div>'}
   let ents=entriesOn(sel);
   const early=isToday?S.tasks.filter(x=>x.done&&x.doneDate===t&&x.date&&x.date<t).map(taskEntry):[];
   const over=isToday?overdueList(t):[];
@@ -1640,24 +1721,28 @@ function weekCell(date,sel,t,i){
   const bd=ents.some(e=>e.kind==='bday');
   return `<button class="wk${bd?' bd':''}${date===t?' today':''}${date===sel?' sel':''}${i>=5?' we':''}" data-act="pickDay" data-date="${date}"><small>${WD[i]}</small><b class="dn${schedStyle(date).c}"${schedStyle(date).s}>${+date.slice(8)}</b><span class="wdot">${dot}</span></button>`;
 }
+function dateBtn(sel){
+  const p={};new Intl.DateTimeFormat('ru',{day:'numeric',month:'long',weekday:'long',year:'numeric'}).formatToParts(pdate(sel)).forEach(x=>{p[x.type]=x.value});
+  return `<button class="datebtn" data-act="calFull" aria-label="Показать весь календарь">${p.day} ${p.month}, ${p.weekday} ${p.year} <span>${ui.calFull?'▴':'▾'}</span></button>`;
+}
 function dayRender(m){
   const t=today();
   const sel=ui.selDay||t;
   const v=ui.month||ymOf(sel);
-  const nav=`<div class="navbar"><button class="ic sm" data-act="monthNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="monthNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
+  const nav=`<div class="navbar"><button class="ic sm" data-act="monthNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="monthNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button><span class="sp"></span>${PHONE.matches?`<button class="btn sm eqb" data-act="calFull">Свернуть</button>`:''}<button class="btn sm primary eqb" data-act="monthToday">Сегодня</button></div>`;
   const banner=ui.buf?`<div class="bufbar"><span>Выбрано: «${esc(ui.buf.title)}». Нажми на дату, чтобы перенести.</span><button class="btn xs" data-act="bufCancel">Отмена</button></div>`:'';
   if(PHONE.matches&&!ui.calFull){
     if(ui.wkFor!==sel){ui.wkFor=sel;ui.wkOff=0}
     const anc=addDays(sel,7*(ui.wkOff||0));
     const dow=(pdate(anc).getDay()+6)%7,mon=addDays(anc,-dow);
     const page=off=>`<div class="wkpage">${Array.from({length:7},(_,i)=>weekCell(addDays(mon,off+i),sel,t,i)).join('')}</div>`;
-    const nv=`<div class="navbar"><b>${monthTitle(ymOf(anc))}</b><span class="sp"></span><button class="btn sm primary" data-act="monthToday">Сегодня</button></div>`;
+    const nv=`<div class="navbar">${dateBtn(sel)}<span class="sp"></span><button class="btn sm primary eqb" data-act="monthToday">Сегодня</button></div>`;
     return `<div class="grow daytile">${banner}<div class="calbox" data-swipe="week">${nv}<div class="weekcar" data-weekcar>${page(-7)}${page(0)}${page(7)}</div></div><div class="daybox" data-scroll="daybox-${m}">${dayPanel(sel,t)}</div></div>`;
   }
   const cal=calGrid(v,(d,dn)=>miniCell(d,dn,sel,t));
   return `<div class="grow daytile">${banner}<div class="calbox">${nav}${cal}</div><div class="daybox" data-scroll="daybox-${m}">${dayPanel(sel,t)}</div></div>`;
 }
-TILES.push({id:'day',title:'Календарь',meta:()=>{const s=ui.selDay||today();const tx=s===today()?fmtDow(s):'выбрано: '+fmtDow(s);return PHONE.matches?`<button class="metabtn" data-act="calFull">${tx} ${ui.calFull?'▴':'▾'}</button>`:tx},render:dayRender});
+TILES.push({id:'day',title:'Календарь',meta:()=>{const s=ui.selDay||today();const tx=s===today()?fmtDow(s):'выбрано: '+fmtDow(s);return PHONE.matches?'':tx},render:dayRender});
 acts.monthNav=el=>{ui.month=ymAdd(ui.month||ymOf(ui.selDay||today()),+el.dataset.d);scheduleRender()};
 acts.monthToday=()=>{ui.month=ymOf(today());ui.selDay=today();ui.wkOff=0;scheduleRender()};
 acts.pickDay=el=>{
@@ -1846,12 +1931,14 @@ forms.postDate=(f,fd)=>{
   },{passive:true});
 })();
 function pullAdd(){
+  ui.pullFocus=true;
   const id=ui.open;
   if(id==='day'){openModal({type:'taskNew',date:ui.selDay||today()});return}
-  const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew',sched:'schedNew'};
+  const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew',sched:'schedNew',notes:'noteNew',insights:'insNew'};
   const b=map[id]&&document.querySelector('#grid [data-act='+map[id]+']')||
     [...document.querySelectorAll('#grid .tile-h button[data-act]')].find(x=>!['blur','close','open','calFull'].includes(x.dataset.act));
   if(b)b.click();else if(map[id]&&acts[map[id]])acts[map[id]]({dataset:{}});
+  if(typeof flushRender==='function')flushRender();
 }
 
 /* лента недель: плавная прокрутка со «щёлкающими» страницами */
@@ -1888,6 +1975,7 @@ function habitsRender(m){
   const nav=`<div class="navbar"><button class="ic" data-act="habNav" data-d="-1" aria-label="Назад">${ic('l',14,2)}</button><b>${monthTitle(v)}</b><button class="ic" data-act="habNav" data-d="1" aria-label="Вперёд">${ic('r',14,2)}</button><span class="sp"></span><button class="btn sm" data-act="habNew">${ic('plus',12,2.2)} Привычка</button></div>`;
   if(!S.habits.length)return nav+`<div class="empty"><b>Привычек пока нет.</b><br>Добавь первую (вода, зарядка, растяжка), задай дни недели, и здесь появится сетка на месяц: ✓ сделал, ✗ пропустил, пустая клетка в прошлом считается пропуском.</div>`;
   const HB=habitsSorted();
+  const plate=habitPlate(t,1);
   const sts=HB.map(h=>habitStreak(h));
   const W=Math.ceil(Math.max(...HB.map((h,i)=>textW(h.name,'500 13px "IBM Plex Sans",sans-serif')+textW('серия '+sts[i],'11px "IBM Plex Mono",monospace')+22)))+8;
   let names=`<div class="hn-h"></div>`,days=`<div class="hdays" style="--n:${n}">`;
@@ -1914,7 +2002,7 @@ function habitsRender(m){
   days+='</div>';
   const legend=`<div class="legend"><span>${ic('check',11,2.4)} сделал</span><span>${ic('x',11,2.4)} пропустил</span><span>штриховка: пропуск</span><span>серые: не по плану</span><span class="negl">красноватые: «не делать», ✓ значит удержался</span><span>колесо мыши над сеткой листает дни</span></div>`;
   const hp=S.prefs.find(x=>x.id==='habw');const NW=hp&&hp.w?hp.w:W;
-  return nav+`<div class="hwrap"><div class="hnames" style="width:${NW}px">${names}</div><div class="hdiv" data-hdiv title="Потяни, чтобы изменить ширину" role="separator" aria-orientation="vertical"><i></i></div><div class="hscroll" data-scroll="hs-${m}" data-hkey="${m}-${v}">${days}</div></div>`+legend;
+  return nav+plate+`<div class="hwrap"><div class="hnames" style="width:${NW}px">${names}</div><div class="hdiv" data-hdiv title="Потяни, чтобы изменить ширину" role="separator" aria-orientation="vertical"><i></i></div><div class="hscroll" data-scroll="hs-${m}" data-hkey="${m}-${v}">${days}</div></div>`+legend;
 }
 document.addEventListener('wheel',e=>{
   const el=e.target.closest&&e.target.closest('.hscroll');if(!el)return;
@@ -2051,7 +2139,7 @@ function subTilesView(tile,m){
       }).join('')}</div>`;
   }
   const l=subList(tile);
-  return `<div class="subgrid f">${l.map(s=>subTile(tile,s,'f')).join('')}
+  return (d.top?d.top():'')+`<div class="subgrid f">${l.map(s=>subTile(tile,s,'f')).join('')}
     <button class="stile add" data-act="subNew" data-tile="${tile}">${ic('plus',20,2)}<span>${d.addLabel}</span></button></div>`;
 }
 function subView(tile,key){
@@ -2298,16 +2386,17 @@ forms.addDeloM=(f,fd)=>{
 const pinned=()=>S.insights.filter(i=>i.pin).sort((a,b)=>(a.at||'').localeCompare(b.at||''));
 function insightsRender(m){
   if(m==='c'){
-    const p=pinned().slice(0,5);
-    if(!p.length)return `<div class="empty">${S.insights.length?'<b>Ничего не закреплено.</b><br>Раскрой плитку и отметь звёздочкой до пяти главных.':'<b>Инсайдов пока нет.</b><br>Нажми «+» в заголовке и запиши мысль, которую хочешь видеть перед глазами.'}</div>`;
+    const pn=pinned().slice(0,5);
+    const p=pn.length>=5?pn:pn.concat(S.insights.filter(i=>!i.pin).sort((a,b)=>(b.at||'').localeCompare(a.at||'')).slice(0,5-pn.length));
+    if(!p.length)return `<div class="empty"><b>Инсайдов пока нет.</b><br>Потяни вниз или раскрой плитку и запиши мысль, которую хочешь видеть перед глазами.</div>`;
     return `<div class="insbig">${p.map(i=>`<button class="ib" data-act="insEdit" data-id="${i.id}"><span class="fit">${esc(i.text)}</span></button>`).join('')}</div>`;
   }
   const fid='insf-f';
   const form=`<form class="qa-row" id="${fid}" data-submit="addInsight">${fld(fid,'text',{ph:'Новый инсайд…',req:1})}<button class="btn primary" aria-label="Добавить" title="Добавить">${ic('plus',14,2.2)}</button></form>`;
   const all=S.insights.slice().sort((a,b)=>(b.at||'').localeCompare(a.at||''));
-  return form+`<div class="hint">Закреплено ${pinned().length} из 5. Закреплённые показываются на главном экране крупными буквами.</div>
+  return form+`<div class="hint">Избранных ${pinned().length} из 5. Избранные (звёздочка) остаются на главном экране, пока их пять; иначе там последние добавленные.</div>
     <div class="inslist full">${all.map(i=>`<div class="insrow${i.pin?' pin':''}">
-      <button class="ic sm${i.pin?' on':''}" data-act="insPin" data-id="${i.id}" aria-label="${i.pin?'Открепить':'Закрепить'}" title="${i.pin?'Открепить':'Закрепить на главном'}">${ic('star',15)}</button>
+      <button class="ic sm${i.pin?' on':''}" data-act="insPin" data-id="${i.id}" aria-label="${i.pin?'Из избранного':'В избранное'}" title="${i.pin?'Убрать из избранного':'В избранное'}">${ic('star',15)}</button>
       <button class="ins" data-act="insEdit" data-id="${i.id}">${esc(i.text)}</button>
       <span class="hint mono">${i.at?fmtShort(i.at.slice(0,10)):''}</span></div>`).join('')||'<div class="empty">Пока пусто.</div>'}</div>`;
 }
@@ -2315,17 +2404,16 @@ acts.insNew=()=>openModal({type:'insNew'});
 MODALS.insNew=()=>`<h3>Новый инсайд</h3>
   <form id="insn" data-submit="addInsight" style="display:flex;flex-direction:column;gap:12px">
     <textarea id="insn-text" name="text" data-draft required data-af placeholder="Мысль, фраза, правило" style="min-height:110px;font-size:15px">${esc(ui.drafts['insn-text']||'')}</textarea>
-    <span class="hint">Первые пять инсайдов закрепляются на главном экране сами.</span>
     <div class="fr"><button class="btn primary">Добавить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
-TILES.push({id:'insights',title:'Инсайды',headExtra:()=>`<button class="ic" data-act="insNew" aria-label="Новый инсайд" title="Новый инсайд">${ic('plus',15,2)}</button>`,meta:()=>S.insights.length?S.insights.length+' шт.':'',render:insightsRender});
+TILES.push({id:'insights',title:'Инсайды',meta:()=>S.insights.length?S.insights.length+' шт.':'',render:insightsRender});
 forms.addInsight=(f,fd)=>{
   const text=(fd.text||'').trim();if(!text)return;
-  store.put('insights',{id:uid(),text,pin:pinned().length<5,at:new Date().toISOString()});
+  store.put('insights',{id:uid(),text,pin:false,at:new Date().toISOString()});
   clearDrafts(f.id+'-');if(ui.modal&&ui.modal.type==='insNew')closeModal();
 };
 acts.insPin=el=>{
   const i=S.insights.find(x=>x.id===el.dataset.id);if(!i)return;
-  if(!i.pin&&pinned().length>=5){toast('Уже закреплено пять. Сначала открепи один.',1);return}
+  if(!i.pin&&pinned().length>=5){toast('Уже пять избранных. Сначала убери одно.',1);return}
   store.upd('insights',i.id,n=>{n.pin=!n.pin});
 };
 acts.insEdit=el=>openModal({type:'insight',id:el.dataset.id});
@@ -2333,7 +2421,7 @@ MODALS.insight=m=>{
   const i=S.insights.find(x=>x.id===m.id);if(!i)return '<h3>Не найдено</h3>';
   return `<h3>Инсайд</h3>
   <textarea id="in-${i.id}" data-chg="insText" data-id="${i.id}" data-af style="min-height:120px;font-size:15px">${esc(i.text)}</textarea>
-  <div class="fr" style="justify-content:space-between"><div class="fr" style="flex:0 0 auto"><button class="btn" data-act="mclose">Готово</button><button class="btn" data-act="insPin" data-id="${i.id}">${ic('star',13)} ${i.pin?'Открепить':'Закрепить'}</button></div>${delBtn('ins-'+i.id,'insDel','data-id="'+i.id+'"')}</div>`;
+  <div class="fr" style="justify-content:space-between"><div class="fr" style="flex:0 0 auto"><button class="btn" data-act="mclose">Готово</button><button class="btn" data-act="insPin" data-id="${i.id}">${ic('star',13)} ${i.pin?'Из избранного':'В избранное'}</button></div>${delBtn('ins-'+i.id,'insDel','data-id="'+i.id+'"')}</div>`;
 };
 chg.insText=el=>{const v=el.value.trim();if(v)store.upd('insights',el.dataset.id,n=>{n.text=v})};
 acts.insDel=el=>ask('ins-'+el.dataset.id,()=>{store.del('insights',el.dataset.id);closeModal()});
@@ -2893,15 +2981,14 @@ MODALS.subscrNew=()=>{
   <form id="${fid}" data-submit="addSubscr" style="display:flex;flex-direction:column;gap:12px">
     <label class="l">Название${fld(fid,'name',{ph:'Например: Оплата воды',req:1,af:1})}</label>
     <div class="fr"><label class="l">Число месяца (1–31)${fld(fid,'day',{req:1,attrs:'inputmode="numeric"',ph:'10'})}</label>
-      <label class="l">Сумма, ₽${fld(fid,'amount',{attrs:'inputmode="decimal"',ph:'1000'})}</label>
-      <label class="l">Время в календаре${timeFld(fid,'time','09:00')}</label></div>
+      <label class="l">Сумма, ₽${fld(fid,'amount',{attrs:'inputmode="decimal"',ph:'1000'})}</label></div>
     <span class="hint">Каждый месяц в этот день в календаре появится дело «Оплата …», а пока не оплачено, подписка висит в «Тратах». В коротких месяцах платёж встаёт на последний день.</span>
     <div class="fr"><button class="btn primary">Добавить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
 };
 forms.addSubscr=(f,fd)=>{
   const name=(fd.name||'').trim();const day=Math.round(num(fd.day)||0);
   if(!name)return;if(day<1||day>31){toast('Число месяца от 1 до 31',1);return}
-  store.put('subs',{id:uid(),name,day,amount:num(fd.amount),time:fd.time||'09:00',created:today(),paid:{}});
+  store.put('subs',{id:uid(),name,day,amount:num(fd.amount),time:'',created:today(),paid:{}});
   closeModal();
 };
 MODALS.subscrEdit=m=>{
@@ -2910,8 +2997,7 @@ MODALS.subscrEdit=m=>{
   return `<h3>Подписка</h3>
   <label class="l">Название<input id="se-${x.id}-name" ${a} data-f="name" value="${esc(x.name)}" data-af></label>
   <div class="fr"><label class="l">Число месяца<input id="se-${x.id}-day" ${a} data-f="day" value="${esc(x.day)}" inputmode="numeric"></label>
-    <label class="l">Сумма, ₽<input id="se-${x.id}-amount" ${a} data-f="amount" value="${esc(x.amount??'')}" inputmode="decimal"></label>
-    <label class="l">Время<input id="se-${x.id}-time" type="time" ${a} data-f="time" value="${esc(x.time||'09:00')}"></label></div>
+    <label class="l">Сумма, ₽<input id="se-${x.id}-amount" ${a} data-f="amount" value="${esc(x.amount??'')}" inputmode="decimal"></label></div>
   <div class="fr" style="justify-content:space-between"><button class="btn" data-act="mclose">Готово</button>${delBtn('subscr-'+x.id,'subscrDel','data-id="'+x.id+'"')}</div>`;
 };
 chg.subscrField=el=>{
@@ -2920,7 +3006,6 @@ chg.subscrField=el=>{
     if(f==='name'){if(v)n.name=v}
     else if(f==='day'){const d=Math.round(num(v)||0);if(d>=1&&d<=31)n.day=d}
     else if(f==='amount')n.amount=num(v);
-    else if(f==='time')n.time=v||'09:00';
   });
 };
 acts.subscrDel=el=>ask('subscr-'+el.dataset.id,()=>{store.del('subs',el.dataset.id);closeModal()});
@@ -3074,36 +3159,59 @@ acts.tgCk=el=>{const g=S.tgroups.find(x=>x.id===el.dataset.id);if(g)store.upd('t
 
 /* ===== Плитка «Идеи и мысли»: подплитки = свои категории, внутри раздельные заметки ===== */
 const notesOf=k=>S.notes.filter(n=>n.cat===k).sort((a,b)=>(b.at||'').localeCompare(a.at||''));
+const noteFull=n=>n.one?(n.text||''):((n.title||'')+(n.text?'\n'+n.text:''));
+const noteLines=n=>{const l=noteFull(n).split('\n');const t=(l.shift()||'').trim();return{t,r:l.join('\n').trim()}};
+const defNoteCat=()=>S.notecats.find(c=>c.def);
 function notesContent(k){
-  const fid='nt-'+k;
-  return `<form class="nform" id="${fid}" data-submit="addNote" data-cat="${esc(k)}">
-    ${fld(fid,'title',{ph:'Заголовок',req:1})}
-    ${fld(fid,'text',{type:'textarea',ph:'Мысль целиком'})}
-    <div class="fr"><button class="btn primary">${ic('plus',12,2.2)} Добавить</button></div></form>
-    ${notesOf(k).map(n=>`<button class="ncard" data-act="noteEdit" data-id="${n.id}"><b>${esc(n.title)}</b>${n.text?`<div class="ntx">${esc(n.text)}</div>`:''}<small>${n.at?fmtShort(n.at.slice(0,10)):''}</small></button>`).join('')||'<div class="empty">Здесь пока нет мыслей.</div>'}`;
+  return `<button class="btn primary block" data-act="noteNew" data-cat="${esc(k)}">${ic('plus',13,2.2)} Добавить</button>
+    ${notesOf(k).map(n=>{const q=noteLines(n);return `<button class="ncard" data-act="noteEdit" data-id="${n.id}"><b>${esc(q.t)}</b>${q.r?`<div class="ntx">${esc(q.r)}</div>`:''}<small>${n.at?fmtShort(n.at.slice(0,10)):''}</small></button>`}).join('')||'<div class="empty">Здесь пока нет мыслей.</div>'}`;
 }
 SUBDEF.notes={tile:'notes',coll:'notecats',noun:'Категория',addLabel:'Новая категория',ph:'Например: Музыка, Бизнес, Жизнь',
-  emptyTitle:'Категорий пока нет.',emptyText:'Нажми «+» и создай первую категорию, дальше пиши мысли.',colorHint:'',
+  emptyTitle:'Мыслей пока нет.',emptyText:'Потяни вниз или нажми «Добавить мысль».',colorHint:'',
+  top:()=>`<button class="btn primary block" data-act="noteNew" data-cat="">${ic('plus',13,2.2)} Добавить мысль</button>`,
   badge:k=>String(notesOf(k).length),
-  preview:k=>notesOf(k).slice(0,12).map(n=>({t:n.title})),
+  preview:k=>notesOf(k).slice(0,12).map(n=>({t:noteLines(n).t})),
   content:notesContent,
-  blockDelete:k=>S.notes.some(n=>n.cat===k),blockMsg:'В категории есть мысли. Сначала удали их.'};
-TILES.push({id:'notes',title:'Идеи и мысли',headExtra:subHeadExtra('notes'),meta:()=>S.notes.length?S.notes.length+' шт.':'',render:m=>subsRender('notes',m)});
+  blockDelete:k=>S.notes.some(n=>n.cat===k)||!!(S.notecats.find(c=>c.id===k)||{}).def,blockMsg:'В категории есть мысли или она по умолчанию.'};
+TILES.push({id:'notes',title:'Идеи и мысли',meta:()=>S.notes.length?S.notes.length+' шт.':'',render:m=>subsRender('notes',m)});
+function noteCatSel(id,value,attrs){
+  return `<select id="${id}" ${attrs}>${S.notecats.map(c=>`<option value="${c.id}"${c.id===value?' selected':''}>${esc(c.name)}</option>`).join('')}</select>`;
+}
+acts.noteNew=el=>{
+  const cat=el&&el.dataset&&el.dataset.cat||ui.sub.notes||'';
+  ui.drafts['nn-cat']=S.notecats.some(c=>c.id===cat)?cat:(defNoteCat()||{}).id||'';
+  openModal({type:'noteNew'});
+};
+MODALS.noteNew=()=>{
+  const fid='nn';
+  return `<h3>Новая мысль</h3>
+  <form id="${fid}" data-submit="addNote" style="display:flex;flex-direction:column;gap:12px">
+    ${fld(fid,'text',{type:'textarea',ph:'Мысль. Первая строка будет заголовком',req:1,af:1})}
+    ${S.notecats.length?`<label class="l">Категория<select id="${fid}-cat" name="cat" data-draft>${S.notecats.map(c=>`<option value="${c.id}"${c.id===ui.drafts['nn-cat']?' selected':''}>${esc(c.name)}${c.def?' (по умолчанию)':''}</option>`).join('')}</select></label>`:''}
+    <div class="fr"><button class="btn primary">Добавить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
+};
 forms.addNote=(f,fd)=>{
-  const title=(fd.title||'').trim();if(!title)return;
-  store.put('notes',{id:uid(),cat:f.dataset.cat,title,text:(fd.text||'').trim(),at:new Date().toISOString()});
-  clearDrafts(f.id+'-');
+  const text=(fd.text||'').trim();if(!text)return;
+  let cat=fd.cat;
+  if(!cat||!S.notecats.some(c=>c.id===cat)){
+    let d=defNoteCat();
+    if(!d){d={id:uid(),name:'Общее',color:PALETTE[0],def:1,created:0};store.put('notecats',d)}
+    cat=d.id;
+  }
+  store.put('notes',{id:uid(),cat,text,one:1,at:new Date().toISOString()});
+  clearDrafts('nn');closeModal();
 };
 acts.noteEdit=el=>openModal({type:'noteEdit',id:el.dataset.id});
 MODALS.noteEdit=m=>{
   const n=S.notes.find(x=>x.id===m.id);if(!n)return '<h3>Не найдено</h3>';
   const a=`data-chg="noteField" data-id="${n.id}"`;
   return `<h3>Мысль</h3>
-  <label class="l">Заголовок<input id="ne-${n.id}-t" ${a} data-f="title" value="${esc(n.title)}" data-af></label>
-  <label class="l">Текст<textarea id="ne-${n.id}-x" ${a} data-f="text" style="min-height:160px;font-size:15px">${esc(n.text||'')}</textarea></label>
+  <textarea id="ne-${n.id}-x" ${a} data-f="text" data-af style="min-height:180px;font-size:15px" placeholder="Первая строка будет заголовком">${esc(noteFull(n))}</textarea>
+  <label class="l">Категория${noteCatSel('ne-'+n.id+'-c',n.cat,`data-chg="noteCat" data-id="${n.id}"`)}</label>
   <div class="fr" style="justify-content:space-between"><button class="btn" data-act="mclose">Готово</button>${delBtn('note-'+n.id,'noteDel','data-id="'+n.id+'"')}</div>`;
 };
-chg.noteField=el=>{const v=el.value.trim();const f=el.dataset.f;if(f==='title'&&!v)return;store.upd('notes',el.dataset.id,n=>{n[f]=v})};
+chg.noteField=el=>{const v=el.value.trim();if(!v)return;store.upd('notes',el.dataset.id,n=>{n.text=v;n.one=1;delete n.title})};
+chg.noteCat=el=>{if(S.notecats.some(c=>c.id===el.value))store.upd('notes',el.dataset.id,n=>{n.cat=el.value})};
 acts.noteDel=el=>ask('note-'+el.dataset.id,()=>{store.del('notes',el.dataset.id);closeModal()});
 
 /* ===== Плитка «Дни рождения» ===== */
@@ -3290,8 +3398,126 @@ forms.saveSchedDay=(f,fd)=>{
 };
 acts.schedDayReset=el=>{store.upd('sched',el.dataset.id,n=>{if(n.ovr)delete n.ovr[el.dataset.date]});clearDrafts('sd-');closeModal()};
 
+/* ===== Плитка «Цикл»: отметки месячных, прогноз и овуляция. Ни с чем, кроме синхронизации устройств, не связана ===== */
+const CYC_SYM=['Боль','Усталость','Головная боль','Настроение','Тошнота','Вздутие'];
+const cycSet=()=>{const p=S.prefs.find(x=>x.id==='cycset');return Object.assign({cycle:28,plen:5,auto:true,on:''},p||{})};
+const cycAvg=a=>Math.round(a.reduce((x,y)=>x+y,0)/a.length);
+function cycModel(){
+  const st=cycSet(),t=today();
+  const stored=new Set(S.cyc.map(x=>x.date));
+  const days=new Set(stored);const virt=new Set();
+  if(st.on&&st.on<=t){for(let d=st.on,g=0;d<=t&&g<60;d=addDays(d,1),g++){if(!days.has(d))virt.add(d);days.add(d)}}
+  const sorted=[...days].sort();
+  const periods=[];
+  sorted.forEach(d=>{const l=periods[periods.length-1];if(l&&diffDays(l.e,d)===1)l.e=d;else periods.push({s:d,e:d})});
+  periods.forEach(p=>{p.len=diffDays(p.s,p.e)+1});
+  const lens=[];for(let i=1;i<periods.length;i++){const n=diffDays(periods[i-1].s,periods[i].s);if(n>=15&&n<=60)lens.push(n)}
+  const ended=periods.filter(p=>!(st.on&&p.s<=st.on&&p.e>=st.on));
+  const cycle=st.auto&&lens.length?cycAvg(lens.slice(-6)):st.cycle;
+  const plen=st.auto&&ended.length?Math.min(10,Math.max(2,cycAvg(ended.slice(-6).map(p=>p.len)))):st.plen;
+  const preds=[],predDays=new Set(),fert=new Set(),ovu=new Set();
+  if(periods.length){
+    const last=periods[periods.length-1];
+    for(let k=1;k<=4;k++){
+      const s=addDays(last.s,cycle*k),e=addDays(s,plen-1);
+      preds.push({s,e});
+      for(let d=s,g=0;d<=e&&g<12;d=addDays(d,1),g++)predDays.add(d);
+      const o=addDays(s,-14);ovu.add(o);
+      for(let i=-5;i<=1;i++)fert.add(addDays(o,i));
+    }
+  }
+  return {st,days,virt,stored,periods,cycle,plen,preds,predDays,fert,ovu,lens};
+}
+function cycHead(M){
+  const t=today(),st=M.st;
+  if(st.on&&st.on<=t){const n=diffDays(st.on,t)+1;return `Идут месячные, день ${n}<small>с ${fmtLong(st.on)}</small>`}
+  if(!M.preds.length)return 'Отметь первый день месячных<small>Дальше появятся прогноз и овуляция</small>';
+  let nx=M.preds.find(p=>p.s>=t);
+  if(!nx){const p0=M.preds[0];return `Задержка ${diffDays(p0.s,t)} ${plural(diffDays(p0.s,t),'день','дня','дней')}<small>ожидались ${fmtLong(p0.s)}</small>`}
+  const n=diffDays(t,nx.s);
+  return n===0?`Ожидаются сегодня<small>${fmtLong(nx.s)}</small>`:`Следующие через ${n} ${plural(n,'день','дня','дней')}<small>ожидаются ${fmtLong(nx.s)}</small>`;
+}
+function cycRender(){
+  const M=cycModel(),t=today(),v=ui.cycMonth||ymOf(t),sel=ui.cycSel||t;
+  const cell=(d,dn)=>{
+    let c='';
+    if(M.days.has(d))c=' cp';else if(M.predDays.has(d))c=' cq';else if(M.ovu.has(d))c=' co';else if(M.fert.has(d))c=' cf';
+    const hasN=S.cycn.some(n=>n.date===d&&(n.text||(n.sym||[]).length));
+    return `<button class="cal-c mini cyc${c}${d===t?' today':''}${d===sel?' sel':''}" data-act="cycPick" data-date="${d}"><span class="dn">${dn}</span>${hasN?'<i></i>':''}</button>`;
+  };
+  const ongoing=!!(M.st.on&&M.st.on<=t);
+  const periodsRev=[...M.periods].reverse().slice(0,8).map(p=>{
+    const idx=M.periods.indexOf(p),nx=M.periods[idx+1];
+    const cyc=nx?diffDays(p.s,nx.s):0;
+    return `<div class="cyrow"><b>${fmtShort(p.s)}${p.e!==p.s?' – '+fmtShort(p.e):''}</b><span>${p.len} ${plural(p.len,'день','дня','дней')}</span><span class="dim">${cyc?'цикл '+cyc+' дн.':'идёт'}</span></div>`}).join('');
+  const nt=S.cycn.find(n=>n.date===sel)||{};
+  const inP=M.days.has(sel),virt=M.virt.has(sel);
+  const kind=inP?'Месячные':M.predDays.has(sel)?'Ожидаются месячные':M.ovu.has(sel)?'Овуляция (по расчёту)':M.fert.has(sel)?'Окно зачатия (по расчёту)':'';
+  return `<div class="cyhead">${cycHead(M)}</div>
+  <div class="fr cybtns"><button class="btn primary" data-act="${ongoing?'cycEnd':'cycStart'}">${ongoing?'Закончились':'Начались'}</button><button class="btn sm" data-act="cycSettings" aria-label="Настройки цикла">Настройки</button></div>
+  <div class="navbar"><button class="ic sm" data-act="cycNav" data-d="-1" aria-label="Назад">${ic('l',13,2)}</button><b>${monthTitle(v)}</b><button class="ic sm" data-act="cycNav" data-d="1" aria-label="Вперёд">${ic('r',13,2)}</button></div>
+  ${calGrid(v,cell)}
+  <div class="cylegend"><span><i class="lp"></i>месячные</span><span><i class="lq"></i>прогноз</span><span><i class="lf"></i>окно</span><span><i class="lo"></i>овуляция</span></div>
+  <div class="cyday"><div class="cyt"><b>${fmtLong(sel)}</b><span class="dim">${kind}</span></div>
+    ${virt?`<div class="hint">Месячные идут. Дни отметятся, когда нажмёшь «Закончились».</div>`:`<button class="btn sm${inP?'':' primary'}" data-act="cycToggle">${inP?'Снять отметку месячных':'Отметить как месячные'}</button>`}
+    <div class="fr" style="gap:6px;flex-wrap:wrap">${CYC_SYM.map(s=>`<button class="btn sm${(nt.sym||[]).includes(s)?' primary':''}" data-act="cycSym" data-s="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+    <textarea id="cy-note-${sel}" rows="2" placeholder="Заметка на день" data-chg="cycNote" data-date="${sel}">${esc(nt.text||'')}</textarea></div>
+  <div class="cystat">Средний цикл: <b>${M.cycle}</b> дн. · месячные: <b>${M.plen}</b> дн.${M.st.auto&&M.lens.length?'':' (по умолчанию)'}</div>
+  ${periodsRev?`<div class="cyhist"><div class="hint">Прошлые циклы</div>${periodsRev}</div>`:''}`;
+}
+TILES.push({id:'cycle',title:'Цикл',meta:()=>{const M=cycModel();return cycHead(M).replace(/<small>.*?<\/small>/,'')},render:cycRender});
+acts.cycNav=el=>{ui.cycMonth=ymAdd(ui.cycMonth||ymOf(today()),+el.dataset.d);scheduleRender()};
+acts.cycPick=el=>{ui.cycSel=el.dataset.date;scheduleRender()};
+acts.cycToggle=()=>{
+  const d=ui.cycSel||today();const ex=S.cyc.find(x=>x.date===d);
+  if(ex)store.del('cyc',ex.id);else store.put('cyc',{id:'d'+d,date:d});
+};
+acts.cycSym=el=>{
+  const d=ui.cycSel||today();const cur=S.cycn.find(n=>n.date===d)||{id:'n'+d,date:d,text:'',sym:[]};
+  const sym=(cur.sym||[]).includes(el.dataset.s)?cur.sym.filter(x=>x!==el.dataset.s):[...(cur.sym||[]),el.dataset.s];
+  store.put('cycn',{...cur,sym});
+};
+chg.cycNote=el=>{
+  const d=el.dataset.date;const cur=S.cycn.find(n=>n.date===d)||{id:'n'+d,date:d,text:'',sym:[]};
+  store.put('cycn',{...cur,text:el.value.trim()});
+};
+/* начались / закончились */
+acts.cycStart=()=>{ui.drafts['cs-date']=today();openModal({type:'cycStart'})};
+acts.cycEnd=()=>{ui.drafts['ce-date']=today();openModal({type:'cycEnd'})};
+MODALS.cycStart=()=>`<h3>Месячные начались</h3><form id="cs" data-submit="cycStart" style="display:flex;flex-direction:column;gap:12px">
+  <label class="l">Первый день${fld('cs','date',{type:'date',req:1,value:ui.drafts['cs-date']||today()})}</label>
+  <div class="fr"><button class="btn primary">Сохранить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
+forms.cycStart=(f,fd)=>{
+  const d=fd.date;if(!d)return;
+  if(!S.cyc.some(x=>x.date===d))store.put('cyc',{id:'d'+d,date:d});
+  store.put('prefs',{...cycSet(),id:'cycset',on:d});
+  ui.cycSel=d;ui.cycMonth=d.slice(0,7);clearDrafts('cs-');closeModal();
+};
+MODALS.cycEnd=()=>`<h3>Месячные закончились</h3><form id="ce" data-submit="cycEnd" style="display:flex;flex-direction:column;gap:12px">
+  <label class="l">Последний день${fld('ce','date',{type:'date',req:1,value:ui.drafts['ce-date']||today()})}</label>
+  <div class="fr"><button class="btn primary">Сохранить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
+forms.cycEnd=(f,fd)=>{
+  const st=cycSet(),end=fd.date;if(!end)return;
+  const from=st.on||end;
+  for(let d=from,g=0;d<=end&&g<60;d=addDays(d,1),g++)if(!S.cyc.some(x=>x.date===d))store.put('cyc',{id:'d'+d,date:d});
+  store.put('prefs',{...st,id:'cycset',on:''});
+  clearDrafts('ce-');closeModal();
+};
+/* настройки */
+acts.cycSettings=()=>{const s=cycSet();ui.drafts['cz-cycle']=String(s.cycle);ui.drafts['cz-plen']=String(s.plen);ui.drafts['cz-auto']=s.auto;openModal({type:'cycSet'})};
+MODALS.cycSet=()=>`<h3>Настройки цикла</h3><form id="cz" data-submit="cycSet" style="display:flex;flex-direction:column;gap:12px">
+  <div class="fr"><label class="l">Длина цикла, дней${fld('cz','cycle',{type:'number',req:1,attrs:'min="15" max="60" inputmode="numeric"',value:ui.drafts['cz-cycle']})}</label>
+  <label class="l">Месячные, дней${fld('cz','plen',{type:'number',req:1,attrs:'min="1" max="14" inputmode="numeric"',value:ui.drafts['cz-plen']})}</label></div>
+  <label class="chkrow"><input type="checkbox" id="cz-auto" name="auto" data-draft ${ui.drafts['cz-auto']?'checked':''}> Считать по моим записям</label>
+  <span class="hint">Пока записей мало, берутся эти значения.</span>
+  <div class="fr"><button class="btn primary">Сохранить</button><button type="button" class="btn" data-act="mclose">Отмена</button></div></form>`;
+forms.cycSet=(f,fd)=>{
+  store.put('prefs',{...cycSet(),id:'cycset',cycle:Math.min(60,Math.max(15,+fd.cycle||28)),plen:Math.min(14,Math.max(1,+fd.plen||5)),auto:!!fd.auto});
+  clearDrafts('cz-');closeModal();
+};
+
 /* ===== Расположение плиток и настройки ===== */
-const DEFSLOTS=['habits','insights','dela','training','spend','docs','subs','goals','trip','notes','bday','sched'];
+const DEFSLOTS=['habits','insights','dela','training','spend','docs','subs','goals','trip','notes','bday','sched','cycle'];
 function layoutSlots(){
   const p=S.prefs.find(x=>x.id==='layout');
   let s=[...new Set(((p&&p.slots)||[]).filter(id=>DEFSLOTS.includes(id)))];
