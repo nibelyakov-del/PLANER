@@ -979,6 +979,21 @@ div.hline{cursor:default}
 .tpop .tp-h,.tpop .tp-mb{background:rgba(8,10,30,.38);border-color:rgba(255,255,255,.22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .tpop .tp-h.on{background:rgba(255,255,255,.28);border-color:#fff;color:#fff}
 
+/* ===== правки v35 ===== */
+.navbar .eqb{width:96px;padding:0}
+body:not(.phone) .crow{flex-wrap:nowrap}
+body:not(.phone) .crow .tw{flex:1 1 0;min-width:0}
+body:not(.phone) .crow .tbtns{flex-wrap:nowrap;flex:none;gap:4px;margin:0 0 0 auto}
+body:not(.phone) .crow .tbtns .btn{width:26px;min-width:26px;height:26px;padding:0;gap:0;border-radius:6px}
+body:not(.phone) .crow .tbtns .btn span{display:none}
+body:not(.phone) .crow .tbtns .btn svg{width:14px;height:14px}
+/* стрелки месяца: компактные, без фона, название не прячется */
+.navbar{gap:2px}
+.navbar .ic{width:22px;height:22px;min-width:22px;min-height:22px;background:transparent;border-color:transparent}
+.navbar b{flex:none;padding:0 4px}
+.phone .navbar .ic{min-width:30px;min-height:30px}
+.divl{background:color-mix(in srgb,var(--fg3) 40%,transparent);margin:8px 0}
+
 </style>
 <div class="app">
   <header class="top">
@@ -1346,7 +1361,9 @@ function render(){
 const acts={},chg={},forms={};
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el)return;
-  const a=acts[el.dataset.act];if(a)a(el,e);
+  const a=acts[el.dataset.act];if(!a)return;
+  const had=!!ui.modal;a(el,e);
+  if(!had&&ui.modal&&/New$/.test(ui.modal.type||'')){ui.pullFocus=true;flushRender()}
 });
 document.addEventListener('change',e=>{
   const el=e.target.closest('[data-chg]');if(!el)return;
@@ -1515,7 +1532,7 @@ function calTaskRow(e,o,c){
   const frag=(e.subs||[]).length?e.subs[0].t:'';
   const when=o.showDate&&e.date&&e.date<today()?`<span class="when">${fmtShort(e.date)}</span>`:'';
   const buf=ui.buf&&ui.buf.id===e.id;
-  const btns=`<div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}">${ic('edit',17,2)}<span>Изменить</span></button>${e.contact?`<button class="btn sm" data-act="contactOpen" data-id="${e.id}">${ic('chat',17,2)}<span>Связаться</span></button>`:''}</div>`;
+  const btns=`<div class="tbtns"><button class="btn sm primary" data-act="calDone" data-id="${e.id}" title="${e.done?'Вернуть':'Сделано'}" aria-label="${e.done?'Вернуть':'Сделано'}">${ic(e.done?'undo':'check',17,2)}<span>${e.done?'Вернуть':'Сделано'}</span></button><button class="btn sm" data-act="postTomorrow" data-id="${e.id}" title="Завтра" aria-label="Завтра">${ic('arr',17,2)}<span>Завтра</span></button><button class="btn sm" data-act="calRemove" data-id="${e.id}" title="Убрать" aria-label="Убрать">${ic('out',17,2)}<span>Убрать</span></button><button class="btn sm" data-act="editTask" data-id="${e.id}" title="Изменить" aria-label="Изменить">${ic('edit',17,2)}<span>Изменить</span></button>${e.contact?`<button class="btn sm" data-act="contactOpen" data-id="${e.id}" title="Связаться" aria-label="Связаться">${ic('chat',17,2)}<span>Связаться</span></button>`:''}</div>`;
   const exp=open?`<div class="subs">${(e.subs||[]).map(s=>`<div class="sub ${s.done?'done':''}"><button class="chk sm ${s.done?'on':''}" style="--c:${c}" data-act="toggleSubtask" data-id="${e.id}" data-sid="${s.id}" aria-label="Подзадача">${ic('check',9,2.4)}</button><span class="subt">${esc(s.t)}</span></div>`).join('')}</div>${o.always?'':btns}`:'';
   return `<div class="item crow${e.time?'':' nt'}${e.done?' done':''}${o.over?' over':''}${e.imp?' imp':''}${open?' open':''}${buf?' buf':''}" style="--c:${c}" data-act="taskTap" data-id="${e.id}" data-press="${e.id}">
     <span class="time">${e.time?esc(e.time):''}</span>
@@ -1679,23 +1696,39 @@ function dayPanel(sel,t){
   const isToday=sel===t,past=sel<t;
   let h=`<div class="dayhead"><div class="dayh">${isToday?'Сегодня, ':''}${fmtLong(sel)}<small>${WDS[pdate(sel).getDay()]}</small></div>
     <button class="btn sm primary" data-act="taskNew" data-date="${sel}" aria-label="Новая задача" title="Новая задача">${ic('plus',13,2.4)} Задача</button></div>`;
-  h+=schedRows(sel);
-  if(sel<=t){const hp=habitPlate(sel);if(hp)h+=hp+'<div class="divl"></div>'}
+  const DV='<div class="divl"></div>';
+  const top=[];
+  const sr=schedRows(sel);if(sr)top.push(sr);
+  if(sel<=t){const hp=habitPlate(sel);if(hp)top.push(hp)}
   let ents=entriesOn(sel);
   const early=isToday?S.tasks.filter(x=>x.done&&x.doneDate===t&&x.date&&x.date<t).map(taskEntry):[];
   const over=isToday?overdueList(t):[];
-  const timed=ents.filter(e=>e.time).sort(byTime);
-  const untimed=[...ents.filter(e=>!e.time),...early].sort(byTime);
+  const dl=a=>a.sort((x,y)=>(x.done?1:0)-(y.done?1:0)||byTime(x,y));
+  const rw=a=>dl(a).map(e=>entryRow(e,{cal:1,always:!PHONE.matches}));
+  const all=ents.concat(early);
+  const isT=e=>e.kind==='task';
   const soon=isToday?S.docs.filter(d=>d.expires&&d.expires>t&&diffDays(t,d.expires)<=(d.remind??30)&&!d.hideRem):[];
-  const dl=a=>a.sort((x,y)=>(x.done?1:0)-(y.done?1:0));
-  h+=`<div class="overbox">${secHtml('Просрочено',dl(over).map(e=>entryRow(e,{over:1,showDate:1,cal:1,always:!PHONE.matches})),'over')}</div><div class="daylist" data-scroll="daylist">`;
-  h+=secHtml('По времени',dl(timed).map(e=>entryRow(e,{cal:1,always:!PHONE.matches})));
-  h+=secHtml('Без времени',dl(untimed).map(e=>entryRow(e,{cal:1,always:!PHONE.matches})));
-  if(soon.length)h+=`<div class="sec"><div class="sec-h">Скоро истекает<b>${soon.length}</b></div>${soon.sort((a,b)=>a.expires.localeCompare(b.expires)).map(d=>`<div class="item" style="--c:${sphereColor(d.sphere)}"><span class="chk sm" style="border-color:var(--accent)"></span><span class="time"></span><span class="t">${esc(d.title)}</span><span class="r"><span class="pill warn">через ${diffDays(t,d.expires)} дн.</span><button class="btn sm" data-act="docHide" data-id="${d.id}">Скрыть</button></span></div>`).join('')}</div>`;
-  if(!over.length&&!timed.length&&!untimed.length&&!soon.length)
-    h+=past?'':`<div class="empty"><b>На этот день пусто.</b><br>Нажми «Задача», чтобы записать дело со временем.</div>`;
-  if(sel<=t)h+=dayExtras(sel);
-  if(past&&!h.includes('class="sec"')&&!h.includes('class="hline'))h+='<div class="empty">В этот день записей нет.</div>';
+  const soonRows=soon.sort((a,b)=>a.expires.localeCompare(b.expires)).map(d=>`<div class="item" style="--c:${sphereColor(d.sphere)}"><span class="chk sm" style="border-color:var(--accent)"></span><span class="time"></span><span class="t">${esc(d.title)}</span><span class="r"><span class="pill warn">через ${diffDays(t,d.expires)} дн.</span><button class="btn sm" data-act="docHide" data-id="${d.id}">Скрыть</button></span></div>`);
+  const groups=[];
+  const add=(label,rows,cls)=>{if(rows.length)groups.push(secHtml(label,rows,cls))};
+  add('По времени',rw(all.filter(e=>isT(e)&&!e.done&&e.time)));
+  add('Без времени',rw(all.filter(e=>isT(e)&&!e.done&&!e.time)));
+  add('Цели',rw(all.filter(e=>e.kind==='gsub')));
+  add('Тренировки',rw(all.filter(e=>e.kind==='workout')));
+  add('Подписки',rw(all.filter(e=>e.kind==='sub')));
+  add('День рождения',rw(all.filter(e=>e.kind==='bday')));
+  add('Документы',rw(all.filter(e=>e.kind==='doc')).concat(soonRows));
+  if(sel<=t){const ex=dayExtras(sel);if(ex)groups.push(ex)}
+  add('Выполнено',rw(all.filter(e=>isT(e)&&e.done)));
+  const overRows=dl(over).map(e=>entryRow(e,{over:1,showDate:1,cal:1,always:!PHONE.matches}));
+  const overHtml=overRows.length?secHtml('Просрочено',overRows,'over'):'';
+  const topAll=top.concat(overHtml?[overHtml]:[]);
+  h+=topAll.slice(0,top.length).join(DV);
+  if(top.length&&overHtml)h+=DV;
+  h+=`<div class="overbox">${overHtml}</div><div class="daylist" data-scroll="daylist">`;
+  if(topAll.length&&groups.length)h+=DV;
+  h+=groups.join(DV);
+  if(!topAll.length&&!groups.length)h+=past?'<div class="empty">В этот день записей нет.</div>':`<div class="empty"><b>На этот день пусто.</b><br>Нажми «Задача», чтобы записать дело со временем.</div>`;
   h+='</div>';
   return h;
 }
@@ -1933,7 +1966,7 @@ forms.postDate=(f,fd)=>{
 function pullAdd(){
   ui.pullFocus=true;
   const id=ui.open;
-  if(id==='day'){openModal({type:'taskNew',date:ui.selDay||today()});return}
+  if(id==='day'){openModal({type:'taskNew',date:ui.selDay||today()});if(typeof flushRender==='function')flushRender();return}
   const map={dela:'delaNew',habits:'habNew',spend:'spendNew',docs:'docNew',subs:'subscrNew',bday:'bdNew',sched:'schedNew',notes:'noteNew',insights:'insNew'};
   const b=map[id]&&document.querySelector('#grid [data-act='+map[id]+']')||
     [...document.querySelectorAll('#grid .tile-h button[data-act]')].find(x=>!['blur','close','open','calFull'].includes(x.dataset.act));
