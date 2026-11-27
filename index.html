@@ -59,7 +59,7 @@ a:hover{text-decoration:underline}
 .tile.full .tile-h{padding:10px 10px 10px 16px}
 
 .modal-wrap{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px}
-.modal{position:relative;width:min(560px,100%);max-height:92vh;overflow:auto;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:12px}
+.modal{position:relative;width:min(560px,100%);max-height:92vh;overflow:auto;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:var(--section-gap)}
 .modal.wide{width:min(760px,100%)}
 .modal h3{margin:0;font-size:15px;font-weight:600;padding-right:32px}
 .mx{position:absolute;top:10px;right:10px}
@@ -82,8 +82,8 @@ input[type=date],input[type=time]{font-family:var(--mono);font-size:12.5px;color
 input[type=checkbox]{width:auto;height:auto}
 input[type=file]{height:auto;padding:6px}
 select{padding-right:4px}
-.l{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--fg3)}
-.fr{display:flex;gap:8px;flex-wrap:wrap}
+.l{display:flex;flex-direction:column;gap:var(--field-gap);font-size:var(--text-small);color:var(--fg3)}
+.fr{display:flex;gap:var(--control-gap);flex-wrap:wrap}
 .fr>*{flex:1 1 120px}
 .fr>.btn{flex:0 0 auto}
 
@@ -994,7 +994,7 @@ body:not(.phone) .crow .tbtns .btn svg{width:14px;height:14px}
 .phone .navbar .ic{min-width:30px;min-height:30px}
 .divl{background:color-mix(in srgb,var(--fg3) 40%,transparent);margin:8px 0}
 
-:root{--row-control:36px;--calendar-action-width:96px}
+:root{--row-control:36px;--calendar-action-width:96px;--control-gap:8px;--section-gap:12px;--field-gap:4px;--text-control:13px;--text-small:12px;--text-detail:11px}
 body.phone{--row-control:40px}
 :is(.fr,.subhead,.tile-h,.dayhead,.navbar,.prog-h,.dayblk-h,.qa-row,.tabs,.strip-h,.tgh,.titem,.hdr,.total,.row,.phrow,.tbtns,.food-macros,.food-tools,.item,.crow):not(.tabbar) :is(.btn,.ic,.tfield,.dfield,select,input:not([type=hidden],[type=checkbox],[type=radio],[type=file],[type=range]),.tab){
   box-sizing:border-box;height:var(--row-control)!important;min-height:var(--row-control)!important;max-height:none;
@@ -1036,24 +1036,35 @@ body.phone{--row-control:40px}
 .tabs.training-tabs,.tabs.ration-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
 .tabs.ration-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
 .tabs.training-tabs .tab,.tabs.ration-tabs .tab{min-width:0;padding-inline:4px}
-.phone .tabbar [data-id=notes]{flex:0 0 108px}
-.phone .tabbar [data-id=notes] span{white-space:normal;text-align:center}
 .sphere-field{position:relative;display:block}
-.sphere-field input[data-combo]{background-image:none;padding-inline-end:38px!important}
-.sphere-field .sphere-arrow{position:absolute;top:50%;right:0;transform:translateY(-50%);width:36px}
+.sphere-field input[data-combo]{background-image:none;padding-inline-end:calc(var(--sq) + var(--field-gap))!important}
+.sphere-field .sphere-arrow{position:absolute;top:50%;right:0;transform:translateY(-50%);width:var(--sq)}
 .sphere-arrow svg{transform:rotate(90deg)}
+.sphere-field button.sphere-arrow:is(:hover,:active,:focus,[aria-expanded=true]),.sphere-field button.sphere-arrow{
+  background:transparent!important;border:0!important;box-shadow:none!important
+}
+.sphere-field button.sphere-arrow:focus:not(:focus-visible){outline:none}
 .task-sphere{cursor:pointer;max-width:100%;white-space:normal;font:inherit;font-size:11px;background:transparent}
 .crow button.task-sphere{
   appearance:none;-webkit-appearance:none;border:0!important;box-shadow:none!important;
   background:none!important;outline:none!important;padding:4px 0
 }
 .crow button.task-sphere:focus-visible{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
-.shop-priority,.pv-priority{font-weight:700;color:var(--fg);opacity:1}
-.shop .acts .shop-priority{width:var(--row-control);min-width:var(--row-control)}
-.shop-priority[aria-pressed=true],.pv-priority[aria-pressed=true]{color:var(--danger)}
-.pv-spend{display:flex;align-items:center;gap:4px}
-.pv-spend .pv-label{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis}
-.pv-priority{height:24px;width:26px;flex:none;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}
+.shop-priority{font-weight:700;color:var(--fg);opacity:1}
+.shop-priority[aria-pressed=true]{color:var(--danger)}
+.shop-expense{gap:var(--control-gap)}
+.shop-expense .nm{min-width:0;display:flex;align-items:center;gap:var(--field-gap);font-size:var(--text-control)}
+.shop-expense .expense-title{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shop-expense .pr,.shop-expense .pricebtn{font-size:var(--text-detail);white-space:nowrap}
+.shop-expense .pricebtn{padding-inline:var(--field-gap)}
+.phone .shop-expense .nm,.phone .delo .t{font-size:var(--text-small)}
+.phone .delo .place{font-size:var(--text-detail)}
+.sphere-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.delo-name{display:flex;align-items:center;min-width:0;gap:var(--field-gap)}
+.delo-name .t{min-width:0;flex:1}
+.delo-name .delo-sphere{display:grid;place-items:center;flex:none;width:var(--bhs);min-height:var(--bhs);
+  padding:0;background:transparent!important;border:0!important;box-shadow:none!important}
+.shop-edit-actions{align-items:center}
 .delo .t,.crow .task-line{display:flex;align-items:baseline;gap:8px;min-width:0}
 .delo .delo-title,.delo .place,.crow .task-line .t,.crow .task-line .place{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .delo .place,.crow .task-line .place{flex:0 1 auto;max-width:46%;margin:0}
@@ -1069,28 +1080,42 @@ body.phone{--row-control:40px}
 .modal-swipe-row{display:none}
 .phone .modal-swipe-row{display:flex;justify-content:flex-end}
 .modal-swipe-row [data-task-swipe]{display:block;width:48%;min-height:46px;touch-action:none}
-.repeat-controls>summary{cursor:pointer;padding:7px 0}
-.repeat-fields{align-items:center}
-.repeat-date{display:flex;flex-direction:column;gap:4px}
-.repeat-days,.repeat-interval,.repeat-date{display:none}
-.repeat-fields:has(option[value=days]:checked) .repeat-days{display:flex;flex:1 0 100%;flex-wrap:wrap;gap:7px 10px}
-.repeat-days label{white-space:nowrap}
-.repeat-fields:has(option[value=interval]:checked) .repeat-interval{display:block}
+.repeat-controls>summary{cursor:pointer;padding:var(--control-gap) 0}
+.repeat-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--control-gap);align-items:end}
+.repeat-fields>select,.repeat-fields .repeat-date input[type=date],.repeat-fields .repeat-interval input[type=number]{
+  box-sizing:border-box;width:100%;height:var(--row-control)!important;min-height:var(--row-control)!important
+}
+.repeat-date,.repeat-days,.repeat-interval{display:none}
+.repeat-date{flex-direction:column;gap:var(--field-gap);font-size:var(--text-small)}
 .repeat-fields:has(option:checked:not([value=""])) .repeat-date{display:flex}
+.repeat-fields:has(option[value=days]:checked) .repeat-days{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-column:1/-1;gap:var(--control-gap)
+}
+.repeat-days label{position:relative;display:grid;place-items:center;min-width:0;height:var(--row-control);
+  border:1px solid var(--line);border-radius:var(--r);font-size:var(--text-small);background:var(--panel2)}
+.repeat-days input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.repeat-days label:has(input:checked){border-color:var(--accent);color:var(--accent)}
+.repeat-days label:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.repeat-fields:has(option[value=interval]:checked) .repeat-interval{display:block}
+.repeat-save{margin-top:var(--control-gap)}
+.phone .repeat-fields{grid-template-columns:minmax(0,1fr)}
+.phone .repeat-days{gap:var(--field-gap)}
 .shop.imp .nm,.shop.imp .nm a{color:var(--danger)}
 .shop .acts{align-items:center;gap:2px}
 .shop .acts .ic{box-sizing:border-box;height:var(--row-control);min-height:var(--row-control)}
 .stile[data-key="_priority-spend"]{grid-column:1/-1;background:color-mix(in srgb,var(--danger) 13%,var(--panel2))}
 .stile[data-key="_priority-spend"] .st-h b{color:var(--danger)}
+.stile[data-key="_spend-history"]{grid-column:1/-1}
+.spend-history-date{margin-top:var(--control-gap)}
 .task-discard{padding:8px;border:1px solid var(--line);border-radius:8px}
 .subgrid.dela-spheres .stile[data-key="_important"]{grid-column:1/-1}
 .stile[data-key="_important"]{background:color-mix(in srgb,var(--danger) 13%,var(--panel2))}
 .stile[data-key="_important"] .st-h b,.pv.imp,.delo.imp .t{color:var(--danger)}
-.delo{grid-template-columns:auto minmax(0,1fr) auto auto auto}
-.phone .delo{grid-template-columns:auto minmax(0,1fr) auto auto}
+.delo{grid-template-columns:auto minmax(0,1fr) auto auto}
+.phone .delo{grid-template-columns:auto minmax(0,1fr) auto}
 .phone .delo>.r{grid-column:2;grid-row:2}
-.phone .delo>.task-sphere{grid-column:3;grid-row:1}
-.phone .delo>.bang{grid-column:4;grid-row:1}
+.phone .delo>.r:empty{display:none}
+.phone .delo>.bang{grid-column:3;grid-row:1}
 .phone .subgrid.dela-spheres{grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(92px,auto)}
 .phone [data-sphere-sort]{user-select:none;-webkit-touch-callout:none}
 .sphere-dragging{outline:2px solid var(--accent);opacity:.8}
@@ -1108,6 +1133,20 @@ body.phone{--row-control:40px}
 .tabs.body-field-tabs{padding:0 13px;margin-top:8px}
 .body-field-tabs .tab{width:100%;min-width:0;padding-inline:3px}
 .body-field-tabs .tab:first-child{grid-column:2}
+.phone .body-form-layout{min-width:590px}
+.body-mobile-date,.body-mobile-values{display:grid;align-items:end;gap:var(--control-gap)}
+.body-mobile-date{grid-template-columns:144px 104px}
+.body-mobile-values{grid-template-columns:repeat(6,minmax(0,1fr))}
+.body-mobile-date :is(input,.btn),.body-mobile-values input{
+  height:var(--row-control)!important;min-height:var(--row-control)!important
+}
+.phone .tabs.body-icon-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--field-gap)}
+.phone .tabs.body-icon-tabs .tab{width:100%;min-width:0;padding:0}
+.body-icon-tabs .tab svg{flex:none;width:24px;height:24px}
+.recipe-ingredient-editor{display:flex;flex-direction:column;gap:var(--control-gap);min-width:0}
+.recipe-ingredient-editor:has(option[value]:not([value=""]):checked) .recipe-manual{display:none}
+.recipe-manual{display:flex;flex-direction:column;gap:var(--control-gap)}
+.recipe-ingredient-editor .recipe-weight{width:min(100%,140px)}
 .body-chart .body-date-tick{font-size:9px}
 .body-date-action{font-size:11px}
 .body-history{margin:4px 0 0;font-size:14px}
@@ -1468,7 +1507,7 @@ function modalHtml(){
 const PHONE=window.matchMedia('(max-width:700px)');
 PHONE.addEventListener('change',()=>scheduleRender());
 const PHONE_TABS=['day','sched','dela','habits','spend'];
-const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Идеи / Мысли / Заметки',bday:'Дни рожд.',sched:'График',cycle:'Цикл'};
+const TABLBL={day:'Календарь',dela:'Дела',habits:'Привычки',spend:'Траты',insights:'Инсайды',training:'Тренировки',docs:'Документы',subs:'Подписки',goals:'Цели',trip:'Вещи',notes:'Заметки',bday:'Дни рожд.',sched:'График',cycle:'Цикл'};
 const TABIC={
  cycle:'<path d="M12 3.5c3 4 5.5 6.6 5.5 10a5.5 5.5 0 11-11 0c0-3.4 2.5-6 5.5-10z"/>',
  sched:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 14h3M13 14h3M8 17h3"/>',
@@ -1498,6 +1537,46 @@ function phoneTabbar(){
   return phoneTabIds().map(id=>{const t=tileById(id);if(!t)return '';
     return `<button class="tab${ui.open===id?' on':''}" data-act="tab" data-id="${id}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[id]||''}</svg><span>${esc(TABLBL[id]||t.title)}</span></button>`}).join('');
 }
+/* Сохраняем узлы открытой задачи, чтобы поле ввода и клавиатура не пересоздавались. */
+let renderedModal=null,renderedModalMarkup='';
+function updateTaskModalNode(current,next){
+  if(current.nodeType!==next.nodeType||current.nodeName!==next.nodeName||
+    (current.nodeType===1&&(current.id!==next.id||current.getAttribute('data-act')!==next.getAttribute('data-act')))){
+    current.replaceWith(next.cloneNode(true));
+    return;
+  }
+  if(current.nodeType!==1){
+    if(current.nodeValue!==next.nodeValue)current.nodeValue=next.nodeValue;
+    return;
+  }
+  const preserve=name=>(name==='open'&&current.matches('details'))||
+    (name==='aria-expanded'&&current.matches('.sphere-arrow'));
+  for(const name of current.getAttributeNames()){
+    if(!next.hasAttribute(name)&&!preserve(name))current.removeAttribute(name);
+  }
+  for(const {name,value} of next.attributes){
+    if(!preserve(name)&&current.getAttribute(name)!==value)current.setAttribute(name,value);
+  }
+  const original=[...current.childNodes],updated=[...next.childNodes];
+  updated.forEach((node,index)=>{
+    if(original[index])updateTaskModalNode(original[index],node);
+    else current.append(node.cloneNode(true));
+  });
+  original.slice(updated.length).forEach(node=>node.remove());
+}
+function renderModal(mount){
+  const markup=modalHtml()+(ui.tpick?tpickHtml():'');
+  mount.hidden=!ui.modal&&!ui.tpick;
+  if(ui.modal===renderedModal&&markup===renderedModalMarkup)return;
+  if(ui.modal===renderedModal&&['task','taskNew'].includes(ui.modal?.type)){
+    const next=mount.cloneNode(false);
+    next.innerHTML=markup;
+    applyFieldHints(next);
+    updateTaskModalNode(mount,next);
+  }else mount.innerHTML=markup;
+  renderedModal=ui.modal;renderedModalMarkup=markup;
+}
+
 function render(){
   applySkin();
   const ae=document.activeElement;
@@ -1528,7 +1607,7 @@ function render(){
   }
   renderHeaderTiles();
   document.body.classList.toggle('mo',!!ui.modal);
-  const mw=$('#modal');mw.hidden=!ui.modal&&!ui.tpick;mw.innerHTML=modalHtml()+(ui.tpick?tpickHtml():'');
+  renderModal($('#modal'));
   applyFieldHints();
   document.dispatchEvent(new Event('planner-render'));
   updatePortionPreview();
@@ -1536,7 +1615,7 @@ function render(){
   $$('[data-scroll]').forEach(el=>{const p=scr[el.dataset.scroll];if(p){el.scrollLeft=p[0];el.scrollTop=p[1]}});
   if(typeof postRender==='function')postRender();
   if(ui.focusModal){ui.focusModal=false;const af=$('#modal [data-af]');if(af){af.focus();return}}
-  if(focus){const el=document.getElementById(focus.id);if(el){el.focus({preventScroll:true});try{if(focus.s!=null)el.setSelectionRange(focus.s,focus.e)}catch(e){}}}
+  if(focus){const el=document.getElementById(focus.id);if(el&&document.activeElement!==el){el.focus({preventScroll:true});try{if(focus.s!=null)el.setSelectionRange(focus.s,focus.e)}catch(e){}}}
 }
 
 /* ================= events ================= */
@@ -1560,7 +1639,7 @@ document.addEventListener('change',e=>{const t=e.target;if(t.type==='date'&&t.pa
 document.addEventListener('click',e=>{const d=e.target.closest&&e.target.closest('.dfield');if(d){const i=d.querySelector('input');try{i.showPicker&&i.showPicker()}catch(_){}}});
 /* нажатие мимо задачи в календаре убирает кнопки */
 document.addEventListener('click',e=>{
-  if(!PHONE.matches||e.target.closest('.crow,.tbtns,.subs'))return;
+  if(!PHONE.matches||e.target.closest('.crow,.tbtns,.subs,#modal,.combo'))return;
   if(!Object.values(ui.rowOpen).some(Boolean))return;
   ui.rowOpen={};scheduleRender();
 });
@@ -1671,7 +1750,7 @@ function setIdeaDone(id,on,fromTask){
 }
 function setShopDone(id,on,fromTask){
   const s=S.shop.find(x=>x.id===id);if(!s)return;
-  store.upd('shop',id,n=>{n.done=on;n.doneDate=on?today():null});
+  store.upd('shop',id,n=>{n.done=on;n.doneDate=on?today():null;n.doneAt=on?Date.now():null});
   if(on)addHist({id:'h-s-'+id,kind:'shop',title:s.title,detail:s.price?rub(s.price):''});else histDel('h-s-'+id);
   if(!fromTask&&s.taskId){const t=S.tasks.find(x=>x.id===s.taskId);if(t&&!!t.done!==on)setTaskDone(t.id,on,true)}
 }
@@ -1847,16 +1926,20 @@ document.addEventListener('change',e=>{const b=e.target.closest&&e.target.closes
   };
   const isInput=t=>t.matches?.('input[data-combo=sph]');
   document.addEventListener('focusin',e=>{
-    if(isInput(e.target))openField(e.target);
+    if(isInput(e.target)){
+      if(e.target.closest('.sphere-field'))close();
+      else openField(e.target);
+    }
     else if(!e.target.closest?.('.sphere-field,.task-sphere,.combo'))close();
   });
   document.addEventListener('input',e=>{
-    if(isInput(e.target))openField(e.target,e.target,norm(e.target.value));
+    if(isInput(e.target)&&!e.target.closest('.sphere-field'))openField(e.target,e.target,norm(e.target.value));
   });
   document.addEventListener('click',e=>{
     const b=e.target.closest?.('.combo .co');
     if(b&&choose){const select=choose;close();select(b);close();return}
-    if(isInput(e.target)&&!box)openField(e.target);
+    if(isInput(e.target)&&e.target.closest('.sphere-field'))close();
+    else if(isInput(e.target)&&!box)openField(e.target);
     else if(box&&!e.target.closest?.('.combo,.sphere-field,.task-sphere,input[data-combo=sph]'))close();
   });
   document.addEventListener('mousedown',e=>{if(e.target.closest?.('.combo .co,.sphere-arrow,.task-sphere'))e.preventDefault()});
@@ -2060,7 +2143,7 @@ MODALS.taskNew=m=>{
     <label class="l">Название${fld(fid,'title',{ph:'Что сделать',req:1,af:1})}</label>
     <div class="fr"><label class="l">Дата${fld(fid,'date',{type:'date',value:m.date,req:1})}</label>
       <div class="l">Время (необязательно)${timeFld(fid,'time','')}</div></div>
-    <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)${sphereField(sphereSel(fid,''))}</label>${impBox(`id="${fid}-imp" name="imp" data-draft`,imp)}</div>
+    <div class="fr sphrow"><label class="l">Сфера${sphereField(sphereSel(fid,''))}</label>${impBox(`id="${fid}-imp" name="imp" data-draft`,imp)}</div>
     <label class="l">Подзадача (необязательно)${fld(fid,'sub',{type:'textarea',ph:'Текст подзадачи или заметка'})}</label>
     <label class="l">Место (необязательно)${fld(fid,'place',{ph:'Например: Студия, ул. Ленина 5'})}</label>
     ${contactBlock(fid,'')}
@@ -2085,7 +2168,7 @@ MODALS.task=m=>{
   const fid='tk-'+t.id;
   return `<h3>Задача</h3>
   <label class="l">Название<input id="${fid}-title" data-chg="taskField" data-id="${t.id}" data-f="title" value="${esc(t.title)}" data-af></label>
-  <div class="fr sphrow"><label class="l">Сфера (выбери или впиши)${sphereField(`<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="taskField" data-id="${t.id}" data-f="sphere" value="${esc(sphereName(t.sphere))}">`)}</label>
+  <div class="fr sphrow"><label class="l">Сфера${sphereField(`<input id="${fid}-sphere" data-combo="sph" autocomplete="off" data-chg="taskField" data-id="${t.id}" data-f="sphere" value="${esc(sphereName(t.sphere))}">`)}</label>
     ${impBox(`id="${fid}-imp" data-chg="taskField" data-id="${t.id}" data-f="imp"`,!!t.imp)}</div>
   <label class="l">Место<input id="${fid}-place" data-chg="taskField" data-id="${t.id}" data-f="place" value="${esc(t.place||'')}" placeholder="Адрес или название"></label>
   ${t.contact||ui.drafts[fid+'-cton']?`<label class="l">Связаться: номер телефона или ссылка<input id="${fid}-contact" data-chg="taskField" data-id="${t.id}" data-f="contact" value="${esc(t.contact||'')}" placeholder="+7 900 000-00-00 или t.me/ник" inputmode="url"></label>`:`<button type="button" class="btn sm" data-act="contactEditOn" data-fid="${fid}" style="align-self:flex-start">Нужно ли связаться?</button>`}
@@ -2404,7 +2487,10 @@ function subList(tile){
     items.unshift({key:IMPORTANT,name:'Суперважное',color:'var(--danger)',opened:0,special:true});
     items.push({key:COMPLETED_DELA,name:'Сделанные',color:'var(--fg3)',opened:0,special:true});
   }
-  if(tile==='spend')items.unshift({key:PRIORITY_SPEND,name:'Первостепенные траты',color:'var(--danger)',opened:0,special:true});
+  if(tile==='spend'){
+    items.unshift({key:PRIORITY_SPEND,name:'Первостепенные траты',color:'var(--danger)',opened:0,special:true});
+    items.push({key:SPEND_HISTORY,name:'История',color:'var(--fg3)',opened:0,special:true});
+  }
   return items;
 }
 function subsRecent(tile){
@@ -2414,30 +2500,36 @@ function subsRecent(tile){
     const current=l.filter(x=>x.key!==COMPLETED_DELA);
     return current.filter(x=>x.special).concat(current.filter(x=>!x.special).sort((a,b)=>b.opened-a.opened).slice(0,6),completed);
   }
-  return l.filter(x=>x.special).concat(l.filter(x=>!x.special).sort((a,b)=>b.opened-a.opened));
+  const recent=l.filter(x=>x.special).concat(l.filter(x=>!x.special).sort((a,b)=>b.opened-a.opened));
+  if(tile!=='spend')return recent;
+  return recent.filter(x=>x.key!==SPEND_HISTORY).slice(0,8).concat(l.find(x=>x.key===SPEND_HISTORY));
 }
 function subTile(tile,s,m){
   const d=SUBDEF[tile];
   const pv=d.preview(s.key);const bk='s:'+tile+':'+s.key;
   return `<div class="stile" role="button" tabindex="0" style="--c:${s.color}" data-act="${m==='c'?'subJump':'subOpen'}" data-tile="${tile}" data-key="${esc(s.key)}" ${tile==='dela'&&m==='f'&&!s.special?'data-sphere-sort':''}>
     <div class="st-h"><i></i><b>${esc(s.name)}</b><span class="st-n${blurOn(bk)?' blur':''}">${esc(d.badge(s.key))}</span>${blurBtn(bk)}</div>
-    <div class="st-b${blurOn(bk)?' blur':''}">${pv.map(x=>x.divider?'<hr class="dela-divider">':`<div class="pv${x.done?' done':''}${x.imp?' imp':''}${x.spendId?' pv-spend':''}">${x.spendId?`<span class="pv-label">${esc(x.t)}</span>${spendPriorityButton(x.spendId,x.imp,true)}`:esc(x.t)}</div>`).join('')||'<div class="pv hint">пусто</div>'}</div></div>`;
+    <div class="st-b${blurOn(bk)?' blur':''}">${pv.map(x=>x.divider?'<hr class="dela-divider">':`<div class="pv${x.done?' done':''}${x.imp?' imp':''}">${esc(x.t)}</div>`).join('')||'<div class="pv hint">пусто</div>'}</div></div>`;
 }
 function subTilesView(tile,m){
   const d=SUBDEF[tile];
   if(m==='c'){
     const l=subsRecent(tile).slice(0,9);
     if(!l.length)return `<div class="empty"><b>${d.emptyTitle}</b><br>${d.emptyText}</div>`;
-    const pinned=tile==='dela'||tile==='spend'?1:0,n=l.length-pinned,cols=n<=1?1:n<=4?2:3,rows=Math.ceil(n/cols)+pinned,rest=n%cols;
+    const pinned=tile==='spend'?2:tile==='dela'?1:0;
+    const n=l.length-pinned,cols=n<=1?1:n<=4?2:3,rows=Math.ceil(n/cols)+pinned,rest=n%cols;
+    const lastRegular=l.length-(tile==='spend'?2:1);
     return `<div class="subgrid c${tile==='dela'?' dela-spheres':''}" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">${
       l.map((s,i)=>{
         const h=subTile(tile,s,'c');
-        return i===l.length-1&&rest?h.replace('<div class="stile"',`<div class="stile" data-span="${cols-rest+1}"`).replace('style="','style="grid-column:span '+(cols-rest+1)+';'):h;
+        return i===lastRegular&&rest?h.replace('<div class="stile"',`<div class="stile" data-span="${cols-rest+1}"`).replace('style="','style="grid-column:span '+(cols-rest+1)+';'):h;
       }).join('')}</div>`;
   }
   const l=subList(tile);
-  return (d.top?d.top():'')+`<div class="subgrid f${tile==='dela'?' dela-spheres':''}">${l.map(s=>subTile(tile,s,'f')).join('')}
-    <button class="stile add" data-act="subNew" data-tile="${tile}">${ic('plus',20,2)}<span>${d.addLabel}</span></button></div>`;
+  const history=tile==='spend'?l.find(s=>s.key===SPEND_HISTORY):null;
+  return (d.top?d.top():'')+`<div class="subgrid f${tile==='dela'?' dela-spheres':''}">${l.filter(s=>s!==history).map(s=>subTile(tile,s,'f')).join('')}
+    <button class="stile add" data-act="subNew" data-tile="${tile}">${ic('plus',20,2)}<span>${d.addLabel}</span></button>
+    ${history?subTile(tile,history,'f'):''}</div>`;
 }
 function subView(tile,key){
   const d=SUBDEF[tile];
@@ -2650,9 +2742,9 @@ function deloRow(t){
   const c=sphereColor(t.sphere);
   return `<div class="delo${t.done?' done':''}${t.imp?' imp':''}" style="--c:${c}">
     <button class="chk ${t.done?'on':''}" style="--c:${c}" data-act="toggleTask" data-id="${t.id}" aria-label="Выполнено">${ic('check',11,2.4)}</button>
-    <button class="t" data-act="editTask" data-id="${t.id}"><span class="delo-title" title="${esc(t.title)}">${esc(t.title)}</span>${t.place?`<span class="place" title="${esc(t.place)}">${esc(t.place)}</span>`:''}</button>
+    <div class="delo-name">${taskSphereButton(t,true)}<button class="t" data-act="editTask" data-id="${t.id}"><span class="delo-title" title="${esc(t.title)}">${esc(t.title)}</span>${t.place?`<span class="place" title="${esc(t.place)}">${esc(t.place)}</span>`:''}</button></div>
     <span class="r">${subs.length?`<span class="pill">${sd}/${subs.length}</span>`:''}${t.date?`<span class="pill warn">${fmtShort(t.date)}${t.time?' '+esc(t.time):''}</span>`:''}</span>
-    ${taskSphereButton(t)}<button class="ic sm bang${t.imp?' on':''}" data-act="toggleImp" data-id="${t.id}" aria-label="Суперважное" title="Суперважное">!</button></div>`;
+    <button class="ic sm bang${t.imp?' on':''}" data-act="toggleImp" data-id="${t.id}" aria-label="Суперважное" title="Суперважное">!</button></div>`;
 }
 function deloForm(fid,key){
   return `<form class="qa-row" id="${fid}" data-submit="addDelo" data-key="${esc(key)}">
@@ -2761,9 +2853,16 @@ function postRender(){fitInsights();centerHabits();if(typeof centerWeek==='funct
 window.addEventListener('resize',()=>scheduleRender());
 
 /* ===== Плитка «Траты»: подплитки = свои категории; внутри список покупок ===== */
-const PRIORITY_SPEND='_priority-spend';
+const PRIORITY_SPEND='_priority-spend',SPEND_HISTORY='_spend-history';
+const purchaseDate=s=>s.doneDate||S.history.find(h=>h.id==='h-s-'+s.id)?.date||'';
+const archivedPurchase=s=>Boolean(s.done)&&purchaseDate(s)<today();
 const spendMatches=(s,cat)=>cat===PRIORITY_SPEND?Boolean(s.imp):s.cat===cat;
-const spendItems=cat=>S.shop.filter(s=>spendMatches(s,cat)&&(cat===PRIORITY_SPEND||!s.done||s.doneDate===today()));
+function spendItems(cat){
+  if(cat===SPEND_HISTORY)return S.shop.filter(archivedPurchase)
+    .sort((a,b)=>purchaseDate(b).localeCompare(purchaseDate(a))||(b.doneAt||0)-(a.doneAt||0));
+  return S.shop.filter(s=>spendMatches(s,cat)&&!archivedPurchase(s))
+    .sort((a,b)=>Number(Boolean(a.done))-Number(Boolean(b.done))||(a.doneAt||0)-(b.doneAt||0));
+}
 function syncShopTask(id){
   const s=S.shop.find(x=>x.id===id);if(!s)return;
   const t=s.taskId&&S.tasks.find(x=>x.id===s.taskId);
@@ -2776,18 +2875,16 @@ function syncShopTask(id){
     store.put('tasks',nt);store.upd('shop',id,n=>{n.taskId=nt.id});
   }
 }
-function spendPriorityButton(id,on,preview=false){
-  return `<button type="button" class="${preview?'pv-priority':'ic sm shop-priority'}" data-act="shopImp" data-id="${esc(id)}" aria-label="Первостепенная трата" aria-pressed="${Boolean(on)}" title="Первостепенная трата">!</button>`;
+function spendPriorityButton(id,on){
+  return `<button type="button" class="btn shop-priority" data-act="shopImp" data-id="${esc(id)}" aria-label="Первостепенная трата" aria-pressed="${Boolean(on)}" title="Первостепенная трата">!</button>`;
 }
 function spendRow(s){
   const link=safeUrl(s.url);
-  const task=s.taskId&&S.tasks.find(x=>x.id===s.taskId);
-  return `<div class="shop${s.done?' done':''}${s.imp?' imp':''}">
+  return `<div class="shop shop-expense${s.done?' done':''}${s.imp?' imp':''}">
     <button class="chk ${s.done?'on':''}" data-act="shopToggle" data-id="${s.id}" aria-label="Куплено">${ic('check',11,2.4)}</button>
-    <span class="nm">${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a>`:esc(s.title)}${task&&task.date?` <span class="pill">${fmtShort(task.date)}</span>`:''} ${sphChip(s.sphere)}</span>
+    <span class="nm">${s.sphere?sphereDot(s.sphere):''}${link?`<a class="expense-title" href="${esc(link)}" target="_blank" rel="noopener noreferrer" title="${esc(s.title)}">${esc(s.title)}</a>`:`<span class="expense-title" title="${esc(s.title)}">${esc(s.title)}</span>`}</span>
     <span class="pr">${ui.priceEdit===s.id?`<input class="priceinp" id="pe-${s.id}" inputmode="decimal" data-chg="shopPrice" data-id="${s.id}" value="${esc(s.price??'')}" placeholder="₽">`:`<button class="pricebtn${s.price?'':' none'}" data-act="priceEdit" data-id="${s.id}" aria-label="Цена" title="Изменить цену">${s.price?rub(s.price):'₽'}</button>`}</span>
-    <span class="acts">${spendPriorityButton(s.id,s.imp)}<button class="ic sm" data-act="shopEdit" data-id="${s.id}" aria-label="Изменить" title="Изменить, сфера, дата">${ic('edit',13)}</button>
-    <button class="ic sm" data-act="shopDel" data-id="${s.id}" aria-label="Удалить" title="Удалить">${ic('trash',13)}</button></span></div>`;
+    <span class="acts"><button class="ic sm" data-act="shopEdit" data-id="${s.id}" aria-label="Изменить" title="Изменить трату">${ic('edit',13)}</button></span></div>`;
 }
 const SUBS='_subs';
 function subsUnpaid(){const ym=today().slice(0,7);return S.subs.filter(x=>!subPaid(x,ym))}
@@ -2799,29 +2896,41 @@ function subsContent(){
     <span class="nm">${esc(x.name)} <span class="pill">${subDate(x,ym).slice(8)} числа</span></span><span class="pr">${x.amount?rub(x.amount):''}</span><span class="acts"></span></div>`).join('')||'<div class="empty"><b>В этом месяце всё оплачено.</b></div>'}
     <div class="total sticky-b"><span>Не оплачено: ${list.length} поз.</span><b>${rub(sum)}</b></div>`;
 }
+function spendHistory(){
+  const items=spendItems(SPEND_HISTORY);
+  if(!items.length)return '<div class="empty">Здесь будут траты, отмеченные купленными в предыдущие дни.</div>';
+  let date=null;
+  return items.map(item=>{
+    const next=purchaseDate(item);
+    const heading=date===next?'':`<div class="sec-h spend-history-date">${fmtDMY(next)||'Дата не указана'}</div>`;
+    date=next;
+    return heading+spendRow(item);
+  }).join('');
+}
 function spendContent(cat){
+  if(cat===SPEND_HISTORY)return spendHistory();
   if(cat===SUBS)return subsContent();
   const fid='shopf-'+cat;
   const items=spendItems(cat);
   const open=S.shop.filter(s=>spendMatches(s,cat)&&!s.done);
   const sum=open.reduce((a,s)=>a+(num(s.price)||0),0);
   return `${cat===PRIORITY_SPEND?'':`<form class="qa-row" id="${fid}" data-submit="addShopQ" data-cat="${esc(cat)}">${fld(fid,'title',{ph:'Новая трата…',req:1})}<button class="btn primary" aria-label="Добавить" title="Добавить">${ic('plus',14,2.2)}</button></form>`}
-    ${items.map(spendRow).join('')||(cat===PRIORITY_SPEND?'<div class="empty">Отметь трату кнопкой «!», чтобы она появилась здесь.</div>':'<div class="empty"><b>Здесь пусто.</b><br>Добавь позицию: название, ссылка, цена. Купил, отметил, и она уйдёт в историю.</div>')}
+    ${items.map(spendRow).join('')||(cat===PRIORITY_SPEND?'<div class="empty">Отметь трату кнопкой «!» в окне редактирования.</div>':'<div class="empty"><b>Здесь пусто.</b><br>Добавь позицию: название, ссылка, цена. Купил, отметил, и она уйдёт в историю.</div>')}
     <div class="total sticky-b"><span>К оплате: ${open.length} поз.</span><b>${rub(sum)}</b></div>`;
 }
 SUBDEF.spend={tile:'spend',coll:'cats',special:()=>S.subs.length?{key:SUBS,label:'Подписки',color:'var(--accent)'}:null,noun:'Категория',addLabel:'Новая категория',ph:'Например: Машина, Долги, Студия',
   emptyTitle:'Категорий трат пока нет.',emptyText:'Нажми «+» в заголовке: например «Машина» или «Долги».',
   colorHint:'',
-  badge:k=>{const o=k===SUBS?subsUnpaid():S.shop.filter(s=>spendMatches(s,k)&&!s.done);const sum=o.reduce((a,s)=>a+(num(s.price??s.amount)||0),0);return rub(sum)},
-  preview:k=>k===SUBS?subsUnpaid().map(x=>({t:x.name+(x.amount?' · '+rub(x.amount):'')})):spendItems(k).slice(0,12).map(s=>({t:s.title+(s.price?' · '+rub(s.price):''),done:s.done,imp:s.imp,spendId:s.id})),
+  badge:k=>{const o=k===SUBS?subsUnpaid():spendItems(k).filter(s=>k===SPEND_HISTORY||!s.done);const sum=o.reduce((a,s)=>a+(num(s.price??s.amount)||0),0);return rub(sum)},
+  preview:k=>k===SUBS?subsUnpaid().map(x=>({t:x.name+(x.amount?' · '+rub(x.amount):'')})):spendItems(k).slice(0,12).map(s=>({t:s.title+(s.price?' · '+rub(s.price):''),done:s.done,imp:s.imp})),
   content:spendContent,
   blockDelete:k=>S.shop.some(s=>s.cat===k),blockMsg:'В категории есть покупки. Сначала удали их или перенеси в другую категорию.'};
 TILES.push({id:'spend',title:'Траты',headExtra:subHeadExtra('spend','spendNew','Новая трата'),
   meta:()=>{const o=S.shop.filter(s=>!s.done);const sum=o.reduce((a,s)=>a+(num(s.price)||0),0)+subsUnpaid().reduce((a,x)=>a+(num(x.amount)||0),0);return sum?rub(sum):''},
   render:m=>subsRender('spend',m)});
 acts.spendNew=el=>{
-  const open=ui.open==='spend'&&ui.sub.spend&&ui.sub.spend!==SUBS&&ui.sub.spend!==PRIORITY_SPEND?ui.sub.spend:'';
-  ui.drafts['sn-cat']=el.dataset.cat&&el.dataset.cat!==SUBS&&el.dataset.cat!==PRIORITY_SPEND?el.dataset.cat:open||(S.cats[0]&&S.cats[0].id)||'';
+  const open=ui.open==='spend'&&ui.sub.spend&&ui.sub.spend!==SUBS&&ui.sub.spend!==PRIORITY_SPEND&&ui.sub.spend!==SPEND_HISTORY?ui.sub.spend:'';
+  ui.drafts['sn-cat']=el.dataset.cat&&el.dataset.cat!==SUBS&&el.dataset.cat!==PRIORITY_SPEND&&el.dataset.cat!==SPEND_HISTORY?el.dataset.cat:open||(S.cats[0]&&S.cats[0].id)||'';
   openModal({type:'spendNew'});
 };
 MODALS.spendNew=()=>{
@@ -2848,11 +2957,11 @@ forms.addShop=(f,fd)=>{
 };
 acts.shopImp=el=>store.upd('shop',el.dataset.id,n=>{n.imp=!n.imp});
 acts.shopToggle=el=>{const s=S.shop.find(x=>x.id===el.dataset.id);if(s)setShopDone(s.id,!s.done)};
-acts.shopDel=el=>{
+acts.shopDel=el=>ask('shop-'+el.dataset.id,()=>{
   const s=S.shop.find(x=>x.id===el.dataset.id);if(!s)return;
   if(s.taskId)store.del('tasks',s.taskId);
-  histDel('h-s-'+s.id);store.del('shop',s.id);
-};
+  histDel('h-s-'+s.id);store.del('shop',s.id);closeModal();
+});
 acts.shopEdit=el=>openModal({type:'shop',id:el.dataset.id});
 MODALS.shop=m=>{
   const s=S.shop.find(x=>x.id===m.id);if(!s)return '<h3>Не найдено</h3>';
@@ -2869,7 +2978,8 @@ MODALS.shop=m=>{
     <label class="l">Время${timeFld(fid+'-sch','time',t?.time||'')}</label>
     <button class="btn">${t&&t.date?'Перенести':'В календарь'}</button>${t&&t.date?`<button type="button" class="btn" data-act="unschedShop" data-id="${s.id}">Убрать дату</button>`:''}</div>
     <span class="hint">С датой покупка появится в календаре. Выполнишь задачу, и покупка отметится купленной.</span></form>
-  <div class="fr"><button class="btn" data-act="mclose">Готово</button></div>`;
+  <div class="fr shop-edit-actions"><button class="btn" data-act="mclose">Готово</button>
+    ${spendPriorityButton(s.id,s.imp)}${delBtn('shop-'+s.id,'shopDel','data-id="'+esc(s.id)+'"')}</div>`;
 };
 chg.shopField=el=>{
   const f=el.dataset.f,v=el.value.trim();
@@ -3066,6 +3176,16 @@ acts.undoWorkout=el=>{
 };
 
 /* ---------- тело ---------- */
+/* Healthicons outline icons (CC0), with measurement markers for chest, shoulders and hips. */
+const BODY_MEASURE_OUTLINE="<g fill=\"currentColor\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M24 12a3 3 0 1 0 0-6a3 3 0 0 0 0 6m0 2a5 5 0 1 0 0-10a5 5 0 0 0 0 10\"/><path d=\"M17.374 18.314A2 2 0 0 1 19 20.28V41a1 1 0 0 0 1 1h.087a1 1 0 0 0 .996-.91L22 31a2 2 0 0 1 4 0l.917 10.09a1 1 0 0 0 .996.91H28a1 1 0 0 0 1-1V20.317a2 2 0 0 1 1.626-1.965c1.756-.334 3.613-.797 5.654-1.392a1 1 0 1 0-.56-1.92c-4.634 1.35-8.19 1.976-11.716 1.96c-3.53-.016-7.09-.674-11.737-1.963a1 1 0 1 0-.534 1.927c2.033.564 3.886 1.016 5.641 1.35m5.604 23.489A3 3 0 0 1 20.087 44H20a3 3 0 0 1-3-3V20.28c-1.826-.348-3.735-.816-5.802-1.39a3 3 0 1 1 1.604-5.78c4.57 1.267 7.935 1.875 11.211 1.89c3.266.014 6.618-.56 11.148-1.88a3 3 0 1 1 1.678 5.76c-2.084.608-4.004 1.088-5.839 1.437V41a3 3 0 0 1-3 3h-.087a3 3 0 0 1-2.988-2.728l-.917-10.09a2 2 0 0 1-.008-.177q0 .088-.008.176l-.918 10.09a3 3 0 0 1-.096.532\"/></g>";
+const BODY_ICONS={
+  weight:`<g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M35.851 16.25c.742.819.515 2.076-.39 2.71l-4.872 3.418c-.904.634-2.14.378-3.033-.27a6.04 6.04 0 0 0-3.455-1.156a6.05 6.05 0 0 0-3.492 1.04c-.915.619-2.158.834-3.04.17l-4.757-3.578c-.882-.664-1.068-1.929-.299-2.722a16 16 0 0 1 23.338.389m-1.655 1.156a14 14 0 0 0-20.067-.334l4.638 3.488a.4.4 0 0 0 .13.006c.157-.014.377-.086.59-.23a8.05 8.05 0 0 1 4.8-1.38q.057-.12.149-.226l2.746-3.158a1 1 0 0 1 1.51 1.312l-2.155 2.478a8 8 0 0 1 2.195 1.127c.208.151.425.23.582.25c.076.01.116.003.13-.001zm-4.743 3.329l-.008.003q.006-.005.008-.003m-10.694-.178l.008.003z"/><path d="M36.216 42a4 4 0 0 0 3.994-3.778l1.556-28A4 4 0 0 0 37.772 6H10.228a4 4 0 0 0-3.993 4.222l1.555 28A4 4 0 0 0 11.784 42zm-24.432-2h24.432a2 2 0 0 0 1.997-1.89l1.556-28A2 2 0 0 0 37.772 8H10.228a2 2 0 0 0-1.997 2.11l1.556 28A2 2 0 0 0 11.784 40"/></g>`,
+  waist:`<path fill="currentColor" fill-rule="evenodd" d="M28.874 9a5 5 0 1 1-10 0a5 5 0 0 1 10 0m-2 0a3 3 0 1 1-6 0a3 3 0 0 1 6 0m-10 23.207a4 4 0 0 1-1.562-2.591q-1.007-.1-1.887-.22c-1.362-.187-2.565-.422-3.469-.715c-.438-.142-.926-.336-1.345-.617c-.33-.22-1.182-.878-1.182-2.064s.852-1.843 1.182-2.064c.419-.281.907-.475 1.345-.617c.854-.277 1.974-.501 3.241-.683l.15 2c-.694.102-1.312.214-1.84.334q-.19.043-.364.088c-1.094.28-1.714.602-1.714.942s.62.661 1.713.942q.176.045.366.088c.965.22 2.23.412 3.716.567l-.222-8.003a4 4 0 0 1 4.44-4.087l3.99.444q.442.048.884 0l3.86-.43a4 4 0 0 1 4.436 4.198l-.441 7.937c1.75-.163 3.228-.377 4.322-.626q.19-.043.365-.088c1.094-.28 1.714-.601 1.714-.942s-.62-.661-1.714-.942a14 14 0 0 0-.858-.193V26.7l-3-3l3-3v2.13c.778.14 1.47.303 2.044.49c.438.141.927.335 1.346.616c.329.22 1.182.878 1.182 2.064s-.853 1.843-1.182 2.064c-.42.281-.908.475-1.346.617c-.904.293-2.107.528-3.468.715c-.775.106-1.627.2-2.543.28a4 4 0 0 1-1.16 2.196V41a3 3 0 0 1-3 3h-.086a3 3 0 0 1-2.988-2.729L24.047 33H23.7l-.752 8.271a3 3 0 0 1-.096.531A3 3 0 0 1 19.96 44h-.086a3 3 0 0 1-3-3zm2 0a2 2 0 0 0-.804-1.603a2 2 0 0 1-.644-.814c1.996.135 4.228.21 6.574.21c2.09 0 4.087-.06 5.91-.168a2 2 0 0 1-.428.604a2 2 0 0 0-.608 1.436V41a1 1 0 0 1-1 1h-.087a1 1 0 0 1-.996-.91l-.752-8.271a2 2 0 0 0-1.992-1.82H23.7a2 2 0 0 0-1.992 1.82l-.752 8.271a1 1 0 0 1-.995.91h-.087a1 1 0 0 1-1-1zM24 28c-2.444 0-4.747-.083-6.77-.229L17 19.539a2 2 0 0 1 2.22-2.043l3.992.444q.662.073 1.325 0l3.86-.43a2 2 0 0 1 2.218 2.1l-.456 8.204c-1.87.12-3.958.187-6.159.187" clip-rule="evenodd"/>`,
+  chest:`<g opacity=".65">${BODY_MEASURE_OUTLINE}</g><path d="M16 23h16" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>`,
+  shoulders:`<g opacity=".65">${BODY_MEASURE_OUTLINE}</g><path d="m12 16 6 1.5m12 0 6-1.5" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>`,
+  biceps:`<path fill="currentColor" fill-rule="evenodd" d="M7 23a1 1 0 0 0-1 1v1h8.794c.356 0 .75.051 1.191.132Q16 25.807 16 26.5a55 55 0 0 1-.327 6.183c-.857.21-1.736.317-2.62.317H6v1a1 1 0 0 0 1 1h6.053c.778 0 1.554-.07 2.318-.209C14.913 37.374 14.244 39 13.5 39c-.5 0-.966-.735-1.357-2h-2.08c.185.699.402 1.336.656 1.872c.197.419.468.884.847 1.272c.382.391 1.034.856 1.934.856s1.552-.465 1.934-.856c.38-.388.65-.853.847-1.272c.4-.847.709-1.945.948-3.141q.141-.71.26-1.507L21.162 33H23a2 2 0 0 0 1.94-1.513c.232-.11.577-.24 1.022-.392a11.93 11.93 0 0 0 5.904-4.42l3.83-5.426l4.819-2.892a1 1 0 0 0 .475-.716l1-7a1 1 0 0 0-.39-.941l-.376-.282a3 3 0 0 0-4.226.635l-.431.592a3 3 0 0 0-.564-.614l-.367-.303a1 1 0 0 0-1.417.147l-3.123 3.905A5 5 0 0 0 30 16.903v1.39l-5.466 1.928c-1.542.545-2.76 1.686-3.78 2.642q-.221.208-.43.4c-.405.371-1.002.453-2.06.282a13 13 0 0 1-.335-.06c-.113-2.36-.356-4.498-.7-6.216c-.24-1.197-.547-2.295-.948-3.142c-.198-.418-.468-.883-.847-1.271C15.052 12.464 14.4 12 13.5 12s-1.552.464-1.934.856c-.38.388-.65.853-.847 1.271c-.37.783-.662 1.781-.893 2.873H7l4 4l3.5-4h-2.625c.437-1.87 1.005-3 1.625-3c1.144 0 2.109 3.844 2.406 9.091A7.6 7.6 0 0 0 14.794 23zm13.684 8.051l-2.932.977c.16-1.694.248-3.568.248-5.528q0-.491-.007-.973c1.126.177 2.558.242 3.683-.79l.466-.431c1.055-.981 1.94-1.804 3.058-2.199l6.133-2.164A1 1 0 0 0 32 19v-2.097a3 3 0 0 1 .657-1.874l2.39-2.987a1 1 0 0 1-.144.891l-.712.979a1 1 0 1 0 1.618 1.176l2.806-3.859a1 1 0 0 1 1.31-.277l-.848 5.935l-4.591 2.755q-.181.11-.303.281l-3.951 5.598a9.93 9.93 0 0 1-4.917 3.682c-.474.162-.935.332-1.287.504a2.8 2.8 0 0 0-.54.332c-.12.099-.488.421-.488.96h-2a1 1 0 0 0-.316.052" clip-rule="evenodd"/>`,
+  hips:`<g opacity=".65">${BODY_MEASURE_OUTLINE}</g><path d="M15 29q9 4 18 0" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" fill="none"/>`
+};
 function bodyView(){
   const fid='bodyf';
   const recs=[...S.body].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
@@ -3077,12 +3197,15 @@ function bodyView(){
   const latest=pts.at(-1);
   const summary=latest?`<strong>${esc(String(latest.y).replace('.',','))} ${unit}</strong><small>${fmtDMY(latest.x)}</small>`:'';
   const chart=pts.length>1?`<div class="body-chart-scroll" data-scroll="body-chart" tabindex="0" role="region" aria-label="График замеров">${lineChart(pts,unit,metric)}</div>`:`<div class="hint">${latest?'График появится после замера в другой день.':'По этому показателю пока нет замеров.'}</div>`;
-  return `<div class="body-form-scroll" data-scroll="body-form" tabindex="0" role="region" aria-label="Ввод и выбор показателей"><div class="body-form-layout"><form class="prog" id="${fid}" data-submit="addBody">
+  const mobile=PHONE.matches;
+  const date=fld(fid,'date',{type:'date',plain:true,req:1,value:today(),attrs:'aria-label="Дата замера"'});
+  const fields=BODY_FIELDS.map(([k,n,u])=>`<label class="l">${n}, ${u}${fld(fid,k,{attrs:'inputmode="decimal"'})}</label>`).join('');
+  const save='<button class="btn primary">Сохранить</button>';
+  const controls=`<div class="tabs ${mobile?'body-icon-tabs':'body-field-tabs'}">${BODY_FIELDS.map(([k,n])=>`<button class="tab ${sel[0]===k?'on':''}" data-act="bodySel" data-v="${k}" aria-pressed="${sel[0]===k}" aria-label="${n}">${mobile?`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">${BODY_ICONS[k]}</svg>`:n}</button>`).join('')}</div>`;
+  return `<div class="body-form-scroll" data-scroll="body-form" tabindex="0" role="region" aria-label="Ввод замеров"><div class="body-form-layout"><form class="prog" id="${fid}" data-submit="addBody">
     <div class="sec-h">Новый замер</div>
-    <div class="fr body-form-fields">${fld(fid,'date',{type:'date',plain:true,req:1,value:today(),attrs:'aria-label="Дата замера"'})}
-    ${BODY_FIELDS.map(([k,n,u])=>`<label class="l" style="flex:1 1 90px">${n}, ${u}${fld(fid,k,{attrs:'inputmode="decimal"'})}</label>`).join('')}
-    <button class="btn primary">Сохранить</button></div></form>
-  <div class="tabs body-field-tabs">${BODY_FIELDS.map(([k,n])=>`<button class="tab ${sel[0]===k?'on':''}" data-act="bodySel" data-v="${k}" aria-pressed="${sel[0]===k}">${n}</button>`).join('')}</div></div></div>
+    ${mobile?`<div class="body-mobile-date">${date}${save}</div><div class="body-mobile-values">${fields}</div>`:`<div class="fr body-form-fields">${date}${fields}${save}</div>`}</form>
+    ${mobile?'':controls}</div></div>${mobile?controls:''}
   <div class="prog body-chart"><figure><figcaption><b>${metric}</b>${summary}</figcaption>${chart}</figure></div>
   ${recs.length?`<h3 class="body-history" id="body-history">История замеров</h3><div class="tw" tabindex="0" role="region" aria-labelledby="body-history"><table class="log"><thead><tr><th scope="col">Дата</th>${BODY_FIELDS.map(([,name,unit])=>`<th scope="col">${name}, ${unit}</th>`).join('')}<th scope="col" aria-label="Действия"></th></tr></thead><tbody>
     ${recs.map(r=>`<tr><td class="m"><button class="btn sm body-date-action" data-act="bodyEditDate" data-id="${esc(r.id)}" aria-label="Изменить дату ${fmtDMY(r.date)}">${fmtDMY(r.date)} ${ic('edit',12)}</button></td>${BODY_FIELDS.map(f=>`<td class="m">${r.vals&&r.vals[f[0]]!=null?String(r.vals[f[0]]).replace('.',','):'·'}</td>`).join('')}<td><button class="ic sm" data-act="bodyDel" data-id="${r.id}" aria-label="Удалить замер">${ic('trash',12)}</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Замеров пока нет. Введи хотя бы один показатель.</div>'}`;
@@ -4273,8 +4396,8 @@ acts.syncNow=()=>{SYNC.run();toast('Сверяю…')};
 acts.syncOut=()=>{SYNC.logout();closeModal();toast('Вышел из синхронизации')};
 
 /* Подсказки в полях, с доступными названиями для экранного диктора. */
-function applyFieldHints(){
-  $$('.l, label').forEach(label=>{
+function applyFieldHints(root=document){
+  $$('.l, label',root).forEach(label=>{
     const fields=[...label.querySelectorAll('input:not([type=hidden]),textarea,select,.tfield')];
     if(fields.length!==1||fields[0].matches('[type=checkbox],[type=radio]'))return;
     const field=fields[0];
@@ -4474,8 +4597,19 @@ acts.recipeEdit=el=>{
 MODALS.recipeEdit=m=>{
   const r=S.recipes.find(x=>x.id===m.id)||{};
   return `<h3>${m.id?'Изменить рецепт':'Новый рецепт'}</h3>
-    <form class="food-stack" data-submit="recipeEdit">
-      ${fld('re','title',{ph:'Название рецепта',req:1,af:1,value:r.title})}
+    ${fld('re','title',{ph:'Название рецепта',req:1,af:1,value:r.title,attrs:'form="recipe-save" aria-label="Название рецепта"'})}
+    <h3>Ингредиенты</h3>
+    ${m.ingredients.map((x,i)=>foodRow(x.title,foodNumber(x.grams)+' г',foodButton('recipeRemoveIngredient','Убрать','data-index="'+i+'"'))).join('')}
+    <form class="recipe-ingredient-editor" data-submit="recipeIngredient">
+      ${S.foodProducts.length?`<select name="product" aria-label="Ингредиент из базы"><option value="">Ввести вручную</option>${S.foodProducts.map(x=>`<option value="${esc(x.id)}">${esc(x.title)}</option>`).join('')}</select>`:''}
+      <div class="recipe-manual">
+        <input name="title" placeholder="Название ингредиента" aria-label="Название ингредиента">
+        <div class="hint">КБЖУ на 100 г</div>
+        <div class="food-macros">${NUTRIENTS.map(([key,label])=>`<input name="${key}" type="number" step="any" inputmode="decimal" placeholder="${label}" aria-label="${label}">`).join('')}</div>
+      </div>
+      <div class="fr"><input class="recipe-weight" name="grams" type="number" inputmode="decimal" min="0.01" step="any" required placeholder="Вес, г" aria-label="Вес ингредиента, г">${foodSubmit('Добавить ингредиент')}</div>
+    </form>
+    <form class="food-stack" id="recipe-save" data-submit="recipeEdit">
       <div class="food-macros">
         ${fld('re','servings',{type:'number',ph:'Количество порций',value:r.servings,req:1,attrs:'min="1" step="1"'})}
         ${fld('re','minutes',{type:'number',ph:'Время готовки, мин',value:r.minutes||'',attrs:'min="1" step="1"'})}
@@ -4483,17 +4617,21 @@ MODALS.recipeEdit=m=>{
       </div>
       ${fld('re','steps',{type:'textarea',ph:'Шаги приготовления',value:r.steps})}
       <div class="fr"><input type="file" accept="image/*" data-chg="recipePhoto" aria-label="Фото рецепта">${m.photo?foodButton('recipeClearPhoto','Убрать фото'):''}</div>
-      <p class="hint">${m.photo?'Фото добавлено':''}</p>
-      ${foodSubmit('Сохранить рецепт')}</form>
-    <h3>Ингредиенты</h3>
-    ${m.ingredients.map((x,i)=>foodRow(x.title,foodNumber(x.grams)+' г',foodButton('recipeRemoveIngredient','Убрать','data-index="'+i+'"'))).join('')}
-    ${S.foodProducts.length?`<form class="fr" data-submit="recipeIngredient">
-      <select name="product" required aria-label="Продукт из базы"><option value="">Продукт из базы</option>${S.foodProducts.map(x=>`<option value="${esc(x.id)}">${esc(x.title)}</option>`).join('')}</select>
-      ${foodField('grams','Вес, г','',.01)}${foodSubmit('Добавить ингредиент')}</form>`:'<div class="hint">Добавь продукты в разделе «Рацион → КБЖУ».</div>'}`;
+      ${m.photo?'<div class="hint">Фото добавлено</div>':''}
+      ${foodSubmit('Сохранить рецепт')}
+    </form>`;
 };
 forms.recipeIngredient=(f,fd)=>{
-  const item=S.foodProducts.find(x=>x.id===fd.product);if(!item)return;
-  ui.modal.ingredients.push({title:item.title,grams:Number(fd.grams),...foodScale(item,1)});
+  const item=S.foodProducts.find(x=>x.id===fd.product);
+  const title=item?.title||fd.title?.trim();
+  const grams=Number(fd.grams);
+  if(!title){toast('Введи название ингредиента',1);return}
+  if(!Number.isFinite(grams)||grams<=0){toast('Укажи вес ингредиента',1);return}
+  if(!item&&NUTRIENTS.some(([key])=>fd[key]?.trim()===''||!Number.isFinite(Number(fd[key]))||Number(fd[key])<0)){
+    toast('Заполни КБЖУ ингредиента на 100 г',1);return;
+  }
+  ui.modal.ingredients.push({title,grams,...foodScale(item||fd,1)});
+  f.reset();
   scheduleRender();
 };
 acts.recipeRemoveIngredient=el=>{ui.modal.ingredients.splice(Number(el.dataset.index),1);scheduleRender()};
@@ -4642,7 +4780,7 @@ function plannerIndex(){
   ];
   collections.forEach(([collection,tile,act])=>S[collection].forEach(x=>{
     const title=x.title||x.name||String(x.text||x.body||'').slice(0,80);
-    const sub=tile==='trip'?x.trip:['spend','docs','training','notes'].includes(tile)?x.cat:undefined;
+    const sub=tile==='trip'?x.trip:['spend','docs','training','notes'].includes(tile)?(tile==='spend'&&archivedPurchase(x)?SPEND_HISTORY:x.cat):undefined;
     const group=x.grp&&S.tgroups.find(g=>g.id===x.grp);
     const path=[tile==='training'?'Программы':tile==='recipes'?'Рецепты':null,sub?category(tile,sub):null,group?.name,title].filter(Boolean);
     add(title,tile,path,{sub,act,id:x.id,record:!act,tab:tile==='training'?'prog':tile==='recipes'?'recipes':undefined,group:x.grp},[x.note,x.text,x.body,x.steps,x.gift,(x.ingredients||[]).map(i=>i.title).join(' ')].join(' '));
@@ -4694,7 +4832,11 @@ acts.plannerGo=el=>{
   }
 };
 
-function taskSphereButton(t){
+function sphereDot(id){
+  return `<span class="sphere-dot" style="--c:${sphereColor(id)}" title="${esc(sphereName(id)||'Без сферы')}" aria-hidden="true"></span>`;
+}
+function taskSphereButton(t,dotOnly=false){
+  if(dotOnly)return `<button type="button" class="task-sphere delo-sphere" data-act="taskSphere" data-id="${esc(t.id)}" aria-label="Сменить сферу: ${esc(sphereName(t.sphere)||'Без сферы')}" aria-expanded="false">${sphereDot(t.sphere)}</button>`;
   return `<button type="button" class="sph task-sphere" style="--c:${sphereColor(t.sphere)}" data-act="taskSphere" data-id="${esc(t.id)}" aria-label="Сменить сферу: ${esc(sphereName(t.sphere)||'Без сферы')}" aria-expanded="false"><i></i>${esc(sphereName(t.sphere)||'Без сферы')}</button>`;
 }
 function sphereField(input){
@@ -4705,7 +4847,7 @@ function repeatControls(fid,rule={},start='',save=false){
   const mode=ui.drafts[fid+'-repeatMode']??rule.mode??'';
   const options=REPEAT_OPTIONS.map(([id,name])=>`<option value="${id}" ${mode===id?'selected':''}>${name}</option>`).join('');
   return `<details class="repeat-controls" ${mode?'open':''}><summary>Повторы${mode?' · '+REPEAT_OPTIONS.find(([id])=>id===mode)?.[1]:''}</summary>
-    <div class="fr repeat-fields"><select id="${fid}-repeatMode" name="repeatMode" data-draft aria-label="Как повторять">${options}</select>
+    <div class="repeat-fields"><select id="${fid}-repeatMode" name="repeatMode" data-draft aria-label="Как повторять">${options}</select>
     ${start?`<label class="repeat-date">Первый день${fld(fid,'repeatStart',{type:'date',plain:true,value:start,attrs:'aria-label="Первый день"'})}</label>`:''}
     <div class="repeat-days" aria-label="Дни недели">${WD.map((label,i)=>{
       const id=fid+'-repeatDay'+i;
@@ -4713,7 +4855,7 @@ function repeatControls(fid,rule={},start='',save=false){
       return `<label><input type="checkbox" id="${id}" name="repeatDay${i}" data-draft ${on?'checked':''}> ${label}</label>`;
     }).join('')}</div>
     <div class="repeat-interval">${fld(fid,'repeatInterval',{type:'number',ph:'Интервал, дней',value:rule.interval||2,attrs:'inputmode="numeric" aria-label="Интервал, дней"'})}</div></div>
-    ${save?'<div class="fr"><button class="btn sm" type="submit">Сохранить повторы</button></div>':''}</details>`;
+    ${save?'<div class="fr repeat-save"><button class="btn sm" type="submit">Сохранить повторы</button></div>':''}</details>`;
 }
 function readRepeat(fd){
   const mode=fd.repeatMode;
@@ -4841,7 +4983,8 @@ document.addEventListener('pointerup',e=>{
   if(taskSwipe?.id!==e.pointerId)return;
   const dy=e.clientY-taskSwipe.y,dx=e.clientX-taskSwipe.x;
   taskSwipe=null;
-  if(dy>=50&&dy>Math.abs(dx)*1.3)swipeCloseTask();
+  const distance=ui.modal?.type==='taskNew'?-dy:dy;
+  if(distance>=50&&distance>Math.abs(dx)*1.3)swipeCloseTask();
 });
 document.addEventListener('pointercancel',()=>{taskSwipe=null});
 
